@@ -54,6 +54,7 @@ bool Lattice::generateLattice(Setup *setup, AlterLattice *alt, Undulator *und)
   double delz=setup->getStepLength();
   double lambda=setup->getReferenceLength();
   double gamma=setup->getReferenceEnergy();
+  double ZR = -lat_ku[i] / (2 * lat_kx[i]);
 
   this->unrollLattice(delz);
   this->calcSlippage(lambda,gamma);
@@ -87,7 +88,7 @@ bool Lattice::generateLattice(Setup *setup, AlterLattice *alt, Undulator *und)
   und->marker.resize(ndata+1);
 
   for (int i=0; i<ndata;i++){
-      und->aw[i]=lat_aw[i];
+      und->aw[i]=lat_aw[i]/sqrt(1+lat_z[i]*lat_z[i]/(ZR*ZR));
       und->ax[i]=lat_ax[i];
       und->ay[i]=lat_ay[i];
       und->ku[i]=lat_ku[i];
@@ -162,7 +163,7 @@ void Lattice::calcSlippage(double lambda, double gamma)
 
   for (int i=0; i< nz;i++){
     if (lat_aw[i]>0){ // within undulator
-      tmp=2*gamma*gamma*lambda/(1+lat_aw[i]*lat_aw[i]);
+      tmp=2*gamma*gamma*lambda/(1+lat_aw[i]*lat_aw[i]/(1 + lat_z[i] * lat_z[i] / (ZR * ZR)));
       lat_slip[i]=lat_dz[i]/tmp;
       lat_phase[i]=0;
 
