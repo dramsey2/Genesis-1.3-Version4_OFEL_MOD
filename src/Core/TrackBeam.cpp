@@ -70,12 +70,10 @@ void TrackBeam::track(double delz, Beam *beam,Undulator *und,bool lastStep=true)
 #ifdef G4_DBGDIAG
 // G4_DBGDIAG: add test against negative radicand? Note that the particles probably already made lots of noise elsewhere.
 #endif
-      (this->*ApplyX)(delz,qx,&(p->x),&(p->px),gammaz,xoff);
-      (this->*ApplyY)(delz,qy,&(p->y),&(p->py),gammaz,yoff);
+      (this->*ApplyX)(delz,qx, kx, &(p->x),&(p->px),gammaz,xoff);
+      (this->*ApplyY)(delz,qy, ky, &(p->y),&(p->py),gammaz,yoff);
     }
   }
-
-
 
   return;
 } 
