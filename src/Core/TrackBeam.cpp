@@ -102,6 +102,7 @@ void TrackBeam::applyFQuad(double delz, double qf, double *x, double *px, double
 }
 
 
+/*
 void TrackBeam::applyDQuad(double delz, double qf, double *x, double *px, double gammaz, double dx)
 {
   double foc=sqrt(-qf/gammaz);
@@ -113,6 +114,26 @@ void TrackBeam::applyDQuad(double delz, double qf, double *x, double *px, double
   *x =a1*xtmp+a2*(*px)/gammaz+dx;
   *px=a3*xtmp*gammaz+a1*(*px);
   return;
+}
+*/
+
+void TrackBeam::applyDQuad(double delz, double qf, double kx, double* x, double* px, double gammaz, double dx)
+{
+
+    double xtmp = *x - dx;
+    double foc = sqrt(-qf / gammaz) * sqrt(1 + 2 * kx * xtmp * xtmp) * exp(kx * xtemp / 2);
+    double omg = foc * delz;
+
+    double a1x = 2 * kx * xtemp * xtemp * xtemp / (1 + 2 * kx * xtemp * xtemp);
+    double a2x = cosh(omg) / (1 + 2 * kx * xtemp * xtemp);
+    double a3x = sinh(omg) / foc;
+
+    double a1p = cosh(omg);
+    double a2p = foc * sinh(omg) / (1 + 2 * kx * xtemp * xtemp);
+
+    *x = a1x + a2x * xtemp + a3x * (*px) / gammaz + dx;
+    *px = a1p * (*px) + a2p * xtemp * gammaz;
+    return;
 }
 
 void TrackBeam::applyCorrector(Beam *beam, double cx, double cy)
