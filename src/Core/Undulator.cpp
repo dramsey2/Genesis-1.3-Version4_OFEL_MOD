@@ -282,6 +282,7 @@ double Undulator::fc(int h)
   }
 }
 
+//Need to alter these functions next
 
 double Undulator::faw2(double x, double y){  // square of the transverse dependence of the undulator field.
   double dx=x-ax[istepz];
