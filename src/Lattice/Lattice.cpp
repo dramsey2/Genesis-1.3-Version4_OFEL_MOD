@@ -54,7 +54,7 @@ bool Lattice::generateLattice(Setup *setup, AlterLattice *alt, Undulator *und)
   double delz=setup->getStepLength();
   double lambda=setup->getReferenceLength();
   double gamma=setup->getReferenceEnergy();
-  double ZR = -lat_ku[i] / (2 * lat_kx[i]);
+  double ZR = -lat_ku[i] / (2 * lat_kx[i]); // Definition of Rayleigh length
 
   this->unrollLattice(delz);
   this->calcSlippage(lambda,gamma);
