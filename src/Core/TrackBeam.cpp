@@ -81,14 +81,14 @@ void TrackBeam::track(double delz, Beam *beam,Undulator *und,bool lastStep=true)
 } 
 
 
-void TrackBeam::applyDrift(double delz, double qf, double *x, double *px, double gammaz, double dx)
+void TrackBeam::applyDrift(double delz, double qf, double kx, double* x, double* px, double gammaz, double dx)
 {
   *x+=(*px)*delz/gammaz;
   return;
 }
 
 
-void TrackBeam::applyFQuad(double delz, double qf, double *x, double *px, double gammaz, double dx)
+void TrackBeam::applyFQuad(double delz, double qf, double kx, double* x, double* px, double gammaz, double dx)
 {
   double foc=sqrt(qf/gammaz);
   double omg=foc*delz;
