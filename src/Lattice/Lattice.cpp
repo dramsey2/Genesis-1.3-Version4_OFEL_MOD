@@ -159,6 +159,7 @@ void Lattice::calcSlippage(double lambda, double gamma)
   // calc the path length for a chicane
 
   double Lz=0;    // projected path
+  double ZR = -lat_ku[0] / (2 * lat_kx[0]); // Definition of Rayleigh length
   double tmp;
 
   for (int i=0; i< nz;i++){
