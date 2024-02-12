@@ -79,14 +79,14 @@ void TrackBeam::track(double delz, Beam *beam,Undulator *und,bool lastStep=true)
 } 
 
 
-void TrackBeam::applyDrift(double delz, double qf, double kx, double* x, double* px, double gammaz, double dx)
+void TrackBeam::applyDrift(double delz, double qf, double kx, double *x, double *px, double gammaz, double dx)
 {
   *x+=(*px)*delz/gammaz;
   return;
 }
 
 
-void TrackBeam::applyFQuad(double delz, double qf, double kx, double* x, double* px, double gammaz, double dx)
+void TrackBeam::applyFQuad(double delz, double qf, double kx, double *x, double *px, double gammaz, double dx)
 {
   double foc=sqrt(qf/gammaz);
   double omg=foc*delz;
@@ -100,7 +100,7 @@ void TrackBeam::applyFQuad(double delz, double qf, double kx, double* x, double*
 }
 
 
-
+/*
 void TrackBeam::applyDQuad(double delz, double qf, double kx, double* x, double* px, double gammaz, double dx)
 {
   double foc=sqrt(-qf/gammaz);
@@ -113,10 +113,10 @@ void TrackBeam::applyDQuad(double delz, double qf, double kx, double* x, double*
   *px=a3*xtmp*gammaz+a1*(*px);
   return;
 }
+*/
 
 
-/*
-void TrackBeam::applyDQuad(double delz, double qf, double kx, double* x, double* px, double gammaz, double dx)
+void TrackBeam::applyDQuad(double delz, double qf, double kx, double *x, double *px, double gammaz, double dx)
 {
 
     // qf has the same sign as kx but it needs to be negated below
@@ -136,7 +136,7 @@ void TrackBeam::applyDQuad(double delz, double qf, double kx, double* x, double*
     *px = a1p * (*px) + a2p * xtmp * gammaz;
     return;
 }
-*/
+
 
 void TrackBeam::applyCorrector(Beam *beam, double cx, double cy)
 { 
