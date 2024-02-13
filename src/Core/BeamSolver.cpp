@@ -160,7 +160,7 @@ void BeamSolver::ODE(double tgam,double tthet) {
       cout << "DBGDIAG(BeamSolver::ODE): error, negative radicand detected" << endl;
     }
 #endif
-    k2pp += xks * (1. - 1. / btpar0) + xku + 1/(1+z_temp*z_tempp/(ZR_temp*ZR_temp));             //dtheta/dz
+    k2pp += xks * (1. - 1. / btpar0) + xku + 1/(1+z_temp*z_temp/(ZR_temp*ZR_temp));             //dtheta/dz
     k2gg += ctmp.imag() / btpar0 / tgam - ez;         //dgamma/dz
 }
 
