@@ -39,8 +39,8 @@ void BeamSolver::advance(double delz, Beam *beam, vector< Field *> *field, Undul
 
     double aw = und->getaw();
     double autophase = und->autophase();
-    double ZR_temp = und->getZR();
-    double z_temp = und->getz();
+ 
+ 
 
     // obtaining long range space charge field
     efield.longRange(beam, und->getGammaRef(), aw);  // defines the array beam->longESC
@@ -145,6 +145,9 @@ void BeamSolver::RungeKutta(double delz) {
 
 void BeamSolver::ODE(double tgam,double tthet) {
 
+    // get Rayleigh range
+    double ZR = und->getZR();
+    double longPos = und->getz();
     // differential equation for longitudinal motion
     double ztemp1 = -2. / xks;
     complex<double> ctmp = 0;
@@ -160,7 +163,7 @@ void BeamSolver::ODE(double tgam,double tthet) {
       cout << "DBGDIAG(BeamSolver::ODE): error, negative radicand detected" << endl;
     }
 #endif
-    k2pp += xks * (1. - 1. / btpar0) + xku + 1/(1+z_temp*z_temp/(ZR_temp*ZR_temp));             //dtheta/dz
+    k2pp += xks * (1. - 1. / btpar0) + xku + ZR/(1+longPos*longPos/(ZR*ZR));             //dtheta/dz
     k2gg += ctmp.imag() / btpar0 / tgam - ez;         //dgamma/dz
 }
 
