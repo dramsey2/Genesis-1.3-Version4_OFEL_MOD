@@ -80,6 +80,8 @@ void BeamSolver::advance(double delz, Beam *beam, vector< Field *> *field, Undul
                     rpart[ifld] = 0;
                 }
             }
+            double longPos = und->getz();
+            double ZR = und->getZR();
             this->RungeKutta(delz);
 
             beam->beam.at(is).at(ip).gamma = gamma;
@@ -145,9 +147,6 @@ void BeamSolver::RungeKutta(double delz) {
 
 void BeamSolver::ODE(double tgam,double tthet) {
 
-    // get Rayleigh range
-    double ZR = und->getZR();
-    double longPos = und->getz();
     // differential equation for longitudinal motion
     double ztemp1 = -2. / xks;
     complex<double> ctmp = 0;
