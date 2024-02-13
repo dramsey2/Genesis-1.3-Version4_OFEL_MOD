@@ -54,7 +54,7 @@ bool Lattice::generateLattice(Setup *setup, AlterLattice *alt, Undulator *und)
   double delz=setup->getStepLength();
   double lambda=setup->getReferenceLength();
   double gamma=setup->getReferenceEnergy();
-  double ZR ; // Declaration of Rayleigh length
+  double ZR_temp ; // Declaration of Rayleigh length
 
   this->unrollLattice(delz);
   this->calcSlippage(lambda,gamma);
@@ -69,6 +69,7 @@ bool Lattice::generateLattice(Setup *setup, AlterLattice *alt, Undulator *und)
   und->ku.resize(ndata);
   und->kx.resize(ndata);
   und->ky.resize(ndata);
+  und->ZR.resize(ndata);
   und->gradx.resize(ndata);
   und->grady.resize(ndata);
   und->qf.resize(ndata);
@@ -89,7 +90,7 @@ bool Lattice::generateLattice(Setup *setup, AlterLattice *alt, Undulator *und)
 
   for (int i=0; i<ndata;i++){
 
-      ZR = -lat_ku[0] / (2 * lat_kx[0]);
+      ZR_temp = -lat_ku[0] / (2 * lat_kx[0]);
       und->aw[i]=lat_aw[i]/sqrt(1 + lat_z[i]*lat_z[i]/(ZR*ZR));
       //und->aw[i]=lat_aw[i];
       und->ax[i]=lat_ax[i];
@@ -99,6 +100,7 @@ bool Lattice::generateLattice(Setup *setup, AlterLattice *alt, Undulator *und)
       //und->ky[i]=lat_ky[i];
       und->kx[i] = lat_kx[i]/(1 + lat_z[i] * lat_z[i] / (ZR * ZR));
       und->ky[i] = lat_ky[i]/ (1 + lat_z[i] * lat_z[i] / (ZR * ZR));
+      und->ZR[i] = ZR_temp;
       und->gradx[i]=lat_gradx[i];
       und->grady[i]=lat_grady[i];
       und->qf[i]=lat_qf[i]; 
