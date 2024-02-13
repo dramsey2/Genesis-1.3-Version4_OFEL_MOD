@@ -59,6 +59,8 @@ void BeamSolver::advance(double delz, Beam *beam, vector< Field *> *field, Undul
             double px = beam->beam.at(is).at(ip).px;
             double py = beam->beam.at(is).at(ip).py;
             double awloc = und->faw(x, y);                 // get the transverse dependence of the undulator field
+            double longPos = und->getz();
+            double ZR = und->getZR();
             btpar = 1 + px * px + py * py + aw * aw * awloc * awloc;
             ez = efield.getEField(ip) + eloss;  // adding global long range space charge field to each particle
             cpart = 0;
@@ -80,8 +82,6 @@ void BeamSolver::advance(double delz, Beam *beam, vector< Field *> *field, Undul
                     rpart[ifld] = 0;
                 }
             }
-            double longPos = und->getz();
-            double ZR = und->getZR();
             this->RungeKutta(delz);
 
             beam->beam.at(is).at(ip).gamma = gamma;
