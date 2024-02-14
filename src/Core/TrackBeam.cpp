@@ -158,6 +158,7 @@ void TrackBeam::applyDQuad(double delz, double qf, double kx, double* x, double*
         *px = a1p * (*px) + a2p * xtmp * gammaz;
     }
     return;
+}
 
 
 void TrackBeam::applyCorrector(Beam *beam, double cx, double cy)
