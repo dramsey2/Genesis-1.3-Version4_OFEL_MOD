@@ -98,7 +98,7 @@ void BeamSolver::RungeKutta(double delz) {
     k2gg = 0;
     k2pp = 0;
 
-    this->ODE(gamma, theta);
+    this->ODE(gamma, theta, z_pos);
 
     // second step
     double stpz = 0.5 * delz;
@@ -112,7 +112,7 @@ void BeamSolver::RungeKutta(double delz) {
     k2gg = 0;
     k2pp = 0;
 
-    this->ODE(gamma, theta);
+    this->ODE(gamma, theta, z_pos + stpz);
 
     // third step
     gamma += stpz * (k2gg - k3gg);
@@ -124,7 +124,7 @@ void BeamSolver::RungeKutta(double delz) {
     k2gg *= -0.5;
     k2pp *= -0.5;
 
-    this->ODE(gamma, theta);
+    this->ODE(gamma, theta, z_pos + stpz);
 
     // fourth step
     stpz = delz;
@@ -138,14 +138,14 @@ void BeamSolver::RungeKutta(double delz) {
     k2gg *= 2;
     k2pp *= 2;
 
-    this->ODE(gamma, theta);
+    this->ODE(gamma, theta, z_pos + stpz);
     gamma += stpz * (k3gg + k2gg / 6.0);
     theta += stpz * (k3pp + k2pp / 6.0);
 
 }
 
 
-void BeamSolver::ODE(double tgam,double tthet) {
+void BeamSolver::ODE(double tgam,double tthet, double z) {
 
     // differential equation for longitudinal motion
     double ztemp1 = -2. / xks;
@@ -162,7 +162,7 @@ void BeamSolver::ODE(double tgam,double tthet) {
       cout << "DBGDIAG(BeamSolver::ODE): error, negative radicand detected" << endl;
     }
 #endif
-    k2pp += xks * (1. - 1. / btpar0) + xku + ZR/(z_pos*z_pos+ZR*ZR);             //dtheta/dz
+    k2pp += xks * (1. - 1. / btpar0) + xku + ZR / (z * z + ZR * ZR);             //dtheta/dz
     k2gg += ctmp.imag() / btpar0 / tgam - ez;         //dgamma/dz
 }
 

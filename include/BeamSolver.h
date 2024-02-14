@@ -45,7 +45,7 @@ private:
     bool onlyFundamental;
 
     void RungeKutta(double);
-    void ODE(double, double);
+    void ODE(double, double, double);
 
     EFieldSolver efield;
     TrackBeam tracker;
