@@ -70,8 +70,10 @@ void TrackBeam::track(double delz, Beam *beam,Undulator *und,bool lastStep=true)
 #ifdef G4_DBGDIAG
 // G4_DBGDIAG: add test against negative radicand? Note that the particles probably already made lots of noise elsewhere.
 #endif
-      (this->*ApplyX)(delz,qx, kx, &(p->x),&(p->px),gammaz,xoff);
-      (this->*ApplyY)(delz,qy, ky, &(p->y),&(p->py),gammaz,yoff);
+      double x_temp = p->x;
+      double y_temp = p->y;
+      (this->*ApplyX)(delz,qx, kx, &(p->x), y_temp, &(p->px), gammaz, xoff);
+      (this->*ApplyY)(delz,qy, ky, &(p->y), x_temp, &(p->py), gammaz, yoff);
     }
   }
 
@@ -79,14 +81,14 @@ void TrackBeam::track(double delz, Beam *beam,Undulator *und,bool lastStep=true)
 } 
 
 
-void TrackBeam::applyDrift(double delz, double qf, double kx, double *x, double *px, double gammaz, double dx)
+void TrackBeam::applyDrift(double delz, double qf, double kx, double *x, double y, double *px, double gammaz, double dx)
 {
   *x+=(*px)*delz/gammaz;
   return;
 }
 
 
-void TrackBeam::applyFQuad(double delz, double qf, double kx, double *x, double *px, double gammaz, double dx)
+void TrackBeam::applyFQuad(double delz, double qf, double kx, double *x, double y, double *px, double gammaz, double dx)
 {
   double foc=sqrt(qf/gammaz);
   double omg=foc*delz;
@@ -116,7 +118,7 @@ void TrackBeam::applyDQuad(double delz, double qf, double kx, double* x, double*
 */
 
 
-void TrackBeam::applyDQuad(double delz, double qf, double kx, double* x, double* px, double gammaz, double dx)
+void TrackBeam::applyDQuad(double delz, double qf, double kx, double* x, double y, double* px, double gammaz, double dx)
 {
 
     // qf has the same sign as kx but it needs to be negated below
@@ -128,7 +130,7 @@ void TrackBeam::applyDQuad(double delz, double qf, double kx, double* x, double*
     if ((1 + 2 * kx * xtmp * xtmp) >= 0)
     {
 
-        foc = sqrt(-qf / gammaz) * sqrt(1 + 2 * kx * xtmp * xtmp) * exp(kx * xtmp * xtmp / 2);
+        foc = sqrt(-qf / gammaz) * sqrt(1 + 2 * kx *( xtmp * xtmp)) * exp(kx * (xtmp * xtmp + y * y) / 2);
         omg = foc * delz;
 
         double a1x = 2 * kx * xtmp * xtmp * xtmp / (1 + 2 * kx * xtmp * xtmp);
@@ -144,7 +146,7 @@ void TrackBeam::applyDQuad(double delz, double qf, double kx, double* x, double*
     }
     else
     {
-        foc = sqrt(-qf / gammaz) * sqrt(-1 - 2 * kx * xtmp * xtmp) * exp(kx * xtmp * xtmp / 2);
+        foc = sqrt(-qf / gammaz) * sqrt(-1 - 2 * kx * xtmp * xtmp) * exp(kx * (xtmp * xtmp + y * y) / 2);
         omg = foc * delz;
 
         double a1x = 2 * kx * xtmp * xtmp * xtmp / (1 + 2 * kx * xtmp * xtmp);
