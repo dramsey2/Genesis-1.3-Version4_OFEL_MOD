@@ -222,6 +222,18 @@ void TrackBeam::applyDQuad(double delz, double qf, double kx, double* x, double*
   return;
 }
 
+void TrackBeam::applyCorrector(Beam* beam, double cx, double cy)
+{
+
+	for (int i = 0; i < beam->beam.size(); i++) {
+		for (int j = 0; j < beam->beam.at(i).size(); j++) {
+			beam->beam.at(i).at(j).px += cx;
+			beam->beam.at(i).at(j).py += cy;
+		}
+	}
+	return;
+}
+
 
 void TrackBeam::applyChicane(Beam *beam, double angle, double lb, double ld, double lt, double gamma0)
 { 
