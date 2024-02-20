@@ -27,7 +27,6 @@ class TrackBeam{
    void (TrackBeam::*ApplyY) (double, double, double *, double *, double, double);
    */
 
-   (double , double , double , double* , double* , double* , double* , double , double )
 
    void (TrackBeam::* ApplyX)  (double, double, double, double*, double*, double*, double*, double, double);
    void (TrackBeam::* ApplyY)   (double, double, double, double*, double*, double*, double*, double, double);
