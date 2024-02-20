@@ -70,10 +70,9 @@ void TrackBeam::track(double delz, Beam *beam,Undulator *und,bool lastStep=true)
 #ifdef G4_DBGDIAG
 // G4_DBGDIAG: add test against negative radicand? Note that the particles probably already made lots of noise elsewhere.
 #endif
-      double x_temp = p->x;
-      double y_temp = p->y;
-      (this->*ApplyX)(delz,qx, kx, &(p->x), y_temp, &(p->px),gammaz,xoff);
-      (this->*ApplyY)(delz,qy, ky, &(p->y), x_temp, &(p->py),gammaz,yoff);
+      (this->*ApplyX)(delz,qx, kx, &(p->x), &(p->y), &(p->px), &(p->py), gammaz, xoff);
+	  //Do not apply Y. It will be updated in ApplyX through the rk4
+      //(this->*ApplyY)(delz,qy, ky, &(p->y), x_temp, &(p->py),gammaz,yoff);
     }
   }
 
@@ -81,14 +80,14 @@ void TrackBeam::track(double delz, Beam *beam,Undulator *und,bool lastStep=true)
 } 
 
 
-void TrackBeam::applyDrift(double delz, double qf, double kx, double *x, double y, double *px, double gammaz, double dx)
+void TrackBeam::applyDrift(double delz, double qf, double kx, double* x, double* y, double* px, double* py, double gammaz, double dx)
 {
   *x+=(*px)*delz/gammaz;
   return;
 }
 
 
-void TrackBeam::applyFQuad(double delz, double qf, double kx, double *x, double y, double *px, double gammaz, double dx)
+void TrackBeam::applyFQuad(double delz, double qf, double kx, double* x, double* y, double* px, double* py, double gammaz, double dx)
 {
   double foc=sqrt(qf/gammaz);
   double omg=foc*delz;
@@ -118,60 +117,108 @@ void TrackBeam::applyDQuad(double delz, double qf, double kx, double* x, double*
 */
 
 
-void TrackBeam::applyDQuad(double delz, double qf, double kx, double* x, double y, double* px, double gammaz, double dx)
+void TrackBeam::applyDQuad(double delz, double qf, double kx, double* x, double* y, double* px, double* py, double gammaz, double dx)
 {
-
-    // qf has the same sign as kx but it needs to be negated below
-
-    double xtmp = *x - dx;
-    double foc;
-    double omg;
-
-    if ((1 + 2 * kx * xtmp * xtmp) >= 0)
-    {
-
-        foc = sqrt(-qf / gammaz) * sqrt(1 + 2 * kx * xtmp * xtmp) * exp(kx * (xtmp * xtmp + y * y) / 2);
-        omg = foc * delz;
-
-        double a1x = 2 * kx * xtmp * xtmp * xtmp / (1 + 2 * kx * xtmp * xtmp);
-        double a2x = cosh(omg) / (1 + 2 * kx * xtmp * xtmp);
-        double a3x = sinh(omg) / foc;
-
-        double a1p = cosh(omg);
-        double a2p = foc * sinh(omg) / (1 + 2 * kx * xtmp * xtmp);
-
-        *x = a1x + a2x * xtmp + a3x * (*px) / gammaz + dx;
-        *px = a1p * (*px) + a2p * xtmp * gammaz;
-
-    }
-    else 
-    {
-        foc = sqrt(-qf / gammaz) * sqrt(-1 - 2 * kx * xtmp * xtmp) * exp(kx * (xtmp * xtmp + y * y) / 2);
-        omg = foc * delz;
-
-        double a1x = 2 * kx * xtmp * xtmp * xtmp / (1 + 2 * kx * xtmp * xtmp);
-        double a2x = cos(omg) / (1 + 2 * kx * xtmp * xtmp);
-        double a3x = sin(omg) / foc;
-
-        double a1p = cos(omg);
-        double a2p = -1*foc * sin(omg) / (1 + 2 * kx * xtmp * xtmp);
-
-        *x = a1x + a2x * xtmp + a3x * (*px) / gammaz + dx;
-        *px = a1p * (*px) + a2p * xtmp * gammaz;
-    }
-    return;
-}
+	// ensure q is negated
+	double focsq = -1*q / gammaz;
+	double dxdz = (*px) / gammaz;
+	double dydz = (*py) / gammaz;
+	double xtmp = (*x);
+	double ytmp = (*y);
 
 
-void TrackBeam::applyCorrector(Beam *beam, double cx, double cy)
-{ 
 
-  for (int i=0; i<beam->beam.size();i++){
-    for (int j=0; j<beam->beam.at(i).size();j++){
-      beam->beam.at(i).at(j).px+=cx;
-      beam->beam.at(i).at(j).py+=cy;
-    }
-  }
+	// first step
+	double K2dxdz = 0;
+	double K2dydz = 0;
+	double K2x = 0;
+	double K2y = 0;
+
+	double kxrsq = kx * (xtmp * xtmp + ytmp * ytmp);
+	K2dxdz += focsq * kxrsq * (kxrsq - 2) * xtmp * exp(kxrsq) / 4;
+	K2dydz += focsq * kxrsq * (kxrsq - 2) * ytmp * exp(kxrsq) / 4;
+	K2x += dxdz;
+	K2y += dydz;
+
+
+	// second step
+	dxdz += 0.5 * dz * K2dxdz;
+	dydz += 0.5 * dz * K2dydz;
+	xtmp += 0.5 * dz * K2x;
+	ytmp += 0.5 * dz * K2y;
+
+	double K3dxdz = K2dxdz;
+	double K3dydz = K2dydz;
+	double K3x = K2x;
+	double K3y = K2y;
+
+	K2dxdz = 0;
+	K2dydz = 0;
+	K2x = 0;
+	K2y = 0;
+
+	kxrsq = kx * (xtmp * xtmp + ytmp * ytmp);
+	K2dxdz += focsq * kxrsq * (kxrsq - 2) * xtmp * exp(kxrsq) / 4;
+	K2dydz += focsq * kxrsq * (kxrsq - 2) * ytmp * exp(kxrsq) / 4;
+	K2x += dxdz;
+	K2y += dydz;
+
+	// third step
+	dxdz += 0.5 * dz * (K2dxdz - K3dxdz);
+	dydz += 0.5 * dz * (K2dydz - K3dydz);
+	xtmp += 0.5 * dz * (K2x - K3x);
+	ytmp += 0.5 * dz * (K2y - K3y);
+
+	K3dxdz /= 6;
+	K3dydz /= 6;
+	K3x /= 6;
+	K3y /= 6;
+
+	K2dxdz *= -0.5;
+	K2dydz *= -0.5;
+	K2x *= -0.5;
+	K2y *= -0.5;
+
+	kxrsq = kx * (xtmp * xtmp + ytmp * ytmp);
+	K2dxdz += focsq * kxrsq * (kxrsq - 2) * xtmp * exp(kxrsq) / 4;
+	K2dydz += focsq * kxrsq * (kxrsq - 2) * ytmp * exp(kxrsq) / 4;
+	K2x += dxdz;
+	K2y += dydz;
+
+	// fourth step
+	dxdz += dz * K2dxdz;
+	dydz += dz * K2dydz;
+	xtmp += dz * K2x;
+	ytmp += dz * K2y;
+
+	K3dxdz -= K2dxdz;
+	K3dydz -= K2dydz;
+	K3x -= K2x;
+	K3y -= K2y;
+
+	K2dxdz *= 2;
+	K2dydz *= 2;
+	K2x *= 2;
+	K2y *= 2;
+
+	kxrsq = kx * (xtmp * xtmp + ytmp * ytmp);
+	K2dxdz += focsq * kxrsq * (kxrsq - 2) * xtmp * exp(kxrsq) / 4;
+	K2dydz += focsq * kxrsq * (kxrsq - 2) * ytmp * exp(kxrsq) / 4;
+	K2x += dxdz;
+	K2y += dydz;
+
+	dxdz += dz * (K3dxdz + K2dxdz / 6);
+	dydz += dz * (K3dydz + K2dydz / 6);
+	xtmp += dz * (K3x + K2x / 6);
+	ytmp += dz * (K3y + K2y / 6);
+
+
+	// pass out
+	*px = gammaz * dxdz;
+	*py = gammaz * dydz;
+	*x = xtmp;
+	*y = ytmp;
+
   return;
 }
 
