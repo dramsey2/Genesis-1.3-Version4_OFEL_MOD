@@ -120,7 +120,7 @@ void TrackBeam::applyDQuad(double delz, double qf, double kx, double* x, double*
 void TrackBeam::applyDQuad(double delz, double qf, double kx, double* x, double* y, double* px, double* py, double gammaz, double dx)
 {
 	// ensure q is negated
-	double focsq = -1*q / gammaz;
+	double focsq = -1*qf / gammaz;
 	double dxdz = (*px) / gammaz;
 	double dydz = (*py) / gammaz;
 	double xtmp = (*x);
