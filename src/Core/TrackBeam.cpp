@@ -142,10 +142,10 @@ void TrackBeam::applyDQuad(double delz, double qf, double kx, double* x, double*
 
 
 	// second step
-	dxdz += 0.5 * dz * K2dxdz;
-	dydz += 0.5 * dz * K2dydz;
-	xtmp += 0.5 * dz * K2x;
-	ytmp += 0.5 * dz * K2y;
+	dxdz += 0.5 * delz * K2dxdz;
+	dydz += 0.5 * delz * K2dydz;
+	xtmp += 0.5 * delz * K2x;
+	ytmp += 0.5 * delz * K2y;
 
 	double K3dxdz = K2dxdz;
 	double K3dydz = K2dydz;
@@ -164,10 +164,10 @@ void TrackBeam::applyDQuad(double delz, double qf, double kx, double* x, double*
 	K2y += dydz;
 
 	// third step
-	dxdz += 0.5 * dz * (K2dxdz - K3dxdz);
-	dydz += 0.5 * dz * (K2dydz - K3dydz);
-	xtmp += 0.5 * dz * (K2x - K3x);
-	ytmp += 0.5 * dz * (K2y - K3y);
+	dxdz += 0.5 * delz * (K2dxdz - K3dxdz);
+	dydz += 0.5 * delz * (K2dydz - K3dydz);
+	xtmp += 0.5 * delz * (K2x - K3x);
+	ytmp += 0.5 * delz * (K2y - K3y);
 
 	K3dxdz /= 6;
 	K3dydz /= 6;
@@ -186,10 +186,10 @@ void TrackBeam::applyDQuad(double delz, double qf, double kx, double* x, double*
 	K2y += dydz;
 
 	// fourth step
-	dxdz += dz * K2dxdz;
-	dydz += dz * K2dydz;
-	xtmp += dz * K2x;
-	ytmp += dz * K2y;
+	dxdz += delz * K2dxdz;
+	dydz += delz * K2dydz;
+	xtmp += delz * K2x;
+	ytmp += delz * K2y;
 
 	K3dxdz -= K2dxdz;
 	K3dydz -= K2dydz;
@@ -207,10 +207,10 @@ void TrackBeam::applyDQuad(double delz, double qf, double kx, double* x, double*
 	K2x += dxdz;
 	K2y += dydz;
 
-	dxdz += dz * (K3dxdz + K2dxdz / 6);
-	dydz += dz * (K3dydz + K2dydz / 6);
-	xtmp += dz * (K3x + K2x / 6);
-	ytmp += dz * (K3y + K2y / 6);
+	dxdz += delz * (K3dxdz + K2dxdz / 6);
+	dydz += delz * (K3dydz + K2dydz / 6);
+	xtmp += delz * (K3x + K2x / 6);
+	ytmp += delz * (K3y + K2y / 6);
 
 
 	// pass out
