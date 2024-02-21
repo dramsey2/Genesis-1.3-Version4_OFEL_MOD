@@ -294,7 +294,7 @@ double Undulator::faw2(double x, double y) {  // square of the transverse depend
 double Undulator::faw(double x, double y) {  // transverse dependence of the undulator field.
     double dx = x - ax[istepz];
     double dy = y - ay[istepz];
-    return exp(kx[istepz] * (dx * dx + dy * dy))/2; // note kx is scaled as XKX*ku*ku in Lattice.cpp, gradx as ku*GRADX.
+    return exp(kx[istepz] * (dx * dx + dy * dy)/2); // note kx is scaled as XKX*ku*ku in Lattice.cpp, gradx as ku*GRADX.
 }
 
 /*
