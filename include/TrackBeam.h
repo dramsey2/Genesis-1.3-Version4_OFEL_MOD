@@ -25,12 +25,15 @@ class TrackBeam{
    /*
    void (TrackBeam::*ApplyX) (double, double, double *, double *, double, double);
    void (TrackBeam::*ApplyY) (double, double, double *, double *, double, double);
+   (double , double , double , double , double , double* , double* , double* , double* , double , double )
+   (double delz, double qf, double kx, double ku, double z, double* x, double* y, double* px, double* py, double gammaz, double dx)
+   (double , double , double , double , double , double* , double* , double* , double* , double , double )
    */
-   void (TrackBeam::* ApplyX) (double, double, double, double *, double, double *, double, double);
-   void (TrackBeam::* ApplyY) (double, double, double, double *, double, double *, double, double);
-   void applyDrift(double, double, double, double *, double, double *, double, double);
-   void applyFQuad(double, double, double, double *, double, double *, double, double);
-   void applyDQuad(double, double, double, double *, double, double *, double, double);
+   void (TrackBeam::* ApplyX)(double, double, double, double, double, double*, double*, double*, double*, double, double);
+   void (TrackBeam::* ApplyY)(double, double, double, double, double, double*, double*, double*, double*, double, double);
+   void applyDrift(double, double, double, double, double, double*, double*, double*, double*, double, double);
+   void applyFQuad(double, double, double, double, double, double*, double*, double*, double*, double, double);
+   void applyDQuad(double, double, double, double, double, double*, double*, double*, double*, double, double);
    void applyCorrector(Beam *, double, double);
    void applyChicane(Beam *, double, double, double, double,double);
    void applyR56(Beam *, Undulator *, double);
