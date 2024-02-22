@@ -282,33 +282,33 @@ double Undulator::fc(int h)
   }
 }
 
-//Need to alter these functions next
 
 double Undulator::faw2(double x, double y) {  // square of the transverse dependence of the undulator field.
     double dx = x - ax[istepz];
     double dy = y - ay[istepz];
-    return exp(kx[istepz] * (dx * dx + dy * dy)); // note kx is scaled as XKX*ku*ku in Lattice.cpp, gradx as ku*GRADX.
+    double z_norm = -z[istepz] / kx[izstepz] * (2 * lat_kx[izstepz]);
+    double x_norm = dx * sqrt(-kx[izstepz]) / sqrt(2);
+    double y_norm = dy * sqrt(-kx[izstepz]) / sqrt(2);
+    double rsq_norm = y_norm * y_norm + x_norm * x_norm;
+
+    double aw_on_ax_factor = sqrt((1 + 5 * pow(z_norm, 2) + 4 * pow(z_norm, 4)) / (pow(1 + z_norm ^ 2, 3));
+    double f_actual = sqrt(exp(-2 * rsq_norm / (1 + pow(z_norm, 2))) * (pow((1 + rsq_norm), 2) + (5 - 4 * rsq_norm) * pow(z_norm, 2) + 4 * pow(z_norm, 4)) / (1 + 5 * pow(z_norm, 2) + 4 * pow(z_norm, 4)));
+
+    return pow(aw_on_ax_factor*f_actual,2); // note kx is scaled as XKX*ku*ku in Lattice.cpp, gradx as ku*GRADX.
 }
 
 double Undulator::faw(double x, double y) {  // transverse dependence of the undulator field.
     double dx = x - ax[istepz];
     double dy = y - ay[istepz];
-    return exp(kx[istepz] * (dx * dx + dy * dy)/2); // note kx is scaled as XKX*ku*ku in Lattice.cpp, gradx as ku*GRADX.
+    double z_norm = -z[istepz] / kx[izstepz] * (2 * lat_kx[izstepz]);
+    double x_norm = dx * sqrt(-kx[izstepz]) / sqrt(2);
+    double y_norm = dy * sqrt(-kx[izstepz]) / sqrt(2);
+    double rsq_norm = y_norm * y_norm + x_norm * x_norm;
+
+    double aw_on_ax_factor = sqrt((1 + 5 * pow(z_norm, 2) + 4 * pow(z_norm, 4)) / (pow(1 + z_norm ^ 2, 3));
+    double f_actual = sqrt(exp(-2 * rsq_norm / (1 + pow(z_norm, 2))) * (pow((1 + rsq_norm), 2) + (5 - 4 * rsq_norm) * pow(z_norm, 2) + 4 * pow(z_norm, 4)) / (1 + 5 * pow(z_norm, 2) + 4 * pow(z_norm, 4)));
+
+    return aw_on_ax_factor * f_actual; // note kx is scaled as XKX*ku*ku in Lattice.cpp, gradx as ku*GRADX.
 }
 
-/*
-double Undulator::faw2(double x, double y) {  // square of the transverse dependence of the undulator field.
-    double dx = x - ax[istepz];
-    double dy = y - ay[istepz];
-    return (1 + kx[istepz] * dx * dx + ky[istepz] * dy * dy + 2 * (gradx[istepz] * dx + grady[istepz] * dy)); // note kx is scaled as XKX*ku*ku in Lattice.cpp, gradx as ku*GRADX.
-}
-
-
-
-double Undulator::faw(double x, double y) {  // transverse dependence of the undulator field.
-    double dx = x - ax[istepz];
-    double dy = y - ay[istepz];
-    return (1 + 0.5 * (kx[istepz] * dx * dx + ky[istepz] * dy * dy) + gradx[istepz] * dx + grady[istepz] * dy); // note kx is scaled as XKX*ku*ku in Lattice.cpp, gradx as ku*GRADX.
-}
-*/
 
