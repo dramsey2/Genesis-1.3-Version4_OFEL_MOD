@@ -171,7 +171,7 @@ void Lattice::calcSlippage(double lambda, double gamma)
   for (int i=0; i< nz;i++){
     if (lat_aw[i]>0){ // within undulator
       z_norm = -lat_z[i] / lat_ku[0] * (2 * lat_kx[0]);
-      tmp=2*gamma*gamma*lambda/(1+lat_aw[i]*lat_aw[i] /((1 + 5 * pow(z_norm, 2) + 4 * pow(z_norm, 4)) / (pow(1 + z_norm ^ 2, 3));
+      tmp=2*gamma*gamma*lambda/(1+lat_aw[i]*lat_aw[i] /((1 + 5 * pow(z_norm, 2) + 4 * pow(z_norm, 4)) / (pow(1 + pow(z_norm , 2), 3));
       lat_slip[i]=lat_dz[i]/tmp;
       lat_phase[i]=0;
 
