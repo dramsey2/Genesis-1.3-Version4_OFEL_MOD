@@ -100,7 +100,6 @@ bool Lattice::generateLattice(Setup *setup, AlterLattice *alt, Undulator *und)
       //und->ky[i]=lat_ky[i];
       und->kx[i] = lat_kx[i];
       und->ky[i] = lat_ky[i];
-      und->ZR[i] = ZR_temp;
       und->gradx[i]=lat_gradx[i];
       und->grady[i]=lat_grady[i];
       und->qf[i]=lat_qf[i]; 
