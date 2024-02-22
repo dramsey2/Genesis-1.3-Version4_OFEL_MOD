@@ -286,7 +286,7 @@ double Undulator::fc(int h)
 double Undulator::faw2(double x, double y) {  // square of the transverse dependence of the undulator field.
     double dx = x - ax[istepz];
     double dy = y - ay[istepz];
-    double z_norm = -z[istepz] / kx[izstepz] * (2 * lat_kx[izstepz]);
+    double z_norm = -z[istepz] / kx[izstepz] * (2 * kx[izstepz]);
     double x_norm = dx * sqrt(-kx[izstepz]) / sqrt(2);
     double y_norm = dy * sqrt(-kx[izstepz]) / sqrt(2);
     double rsq_norm = y_norm * y_norm + x_norm * x_norm;
@@ -300,7 +300,7 @@ double Undulator::faw2(double x, double y) {  // square of the transverse depend
 double Undulator::faw(double x, double y) {  // transverse dependence of the undulator field.
     double dx = x - ax[istepz];
     double dy = y - ay[istepz];
-    double z_norm = -z[istepz] / kx[izstepz] * (2 * lat_kx[izstepz]);
+    double z_norm = -z[istepz] / kx[izstepz] * (2 * kx[izstepz]);
     double x_norm = dx * sqrt(-kx[izstepz]) / sqrt(2);
     double y_norm = dy * sqrt(-kx[izstepz]) / sqrt(2);
     double rsq_norm = y_norm * y_norm + x_norm * x_norm;
