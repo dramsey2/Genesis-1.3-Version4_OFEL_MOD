@@ -40,7 +40,6 @@ void BeamSolver::advance(double delz, Beam *beam, vector< Field *> *field, Undul
     double aw = und->getaw();
     double autophase = und->autophase();
     z_pos = und->getz();
-    ZR = und->getZR();
  
  
 
@@ -162,7 +161,7 @@ void BeamSolver::ODE(double tgam,double tthet, double z) {
       cout << "DBGDIAG(BeamSolver::ODE): error, negative radicand detected" << endl;
     }
 #endif
-    k2pp += xks * (1. - 1. / btpar0) + xku + ZR / (z * z + ZR * ZR);             //dtheta/dz
+    k2pp += xks * (1. - 1. / btpar0) + xku              //dtheta/dz
     k2gg += ctmp.imag() / btpar0 / tgam - ez;         //dgamma/dz
 }
 

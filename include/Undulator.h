@@ -56,7 +56,7 @@ class Undulator: public HDF5Base{
    int getStep();
 
 
-   vector<double> aw,ax,ay,ku,kx,ky,ZR,cx,cy,gradx,grady;
+   vector<double> aw,ax,ay,ku,kx,ky,cx,cy,gradx,grady;
    vector<double> qf,qx,qy,z,dz,slip,phaseshift; 
    vector<double> chic_angle,chic_lb,chic_ld,chic_lt; 
    vector<double> paw,pkx,pky,pgradx,pgrady,pphase; // perpendicular undulator parameters
@@ -108,9 +108,6 @@ inline double Undulator::getz(){
   return (istepz<0 ? 0. : z[istepz]+dz[istepz]);
 }
 
-inline double Undulator::getZR() {
-    return ZR[istepz];
-}
 inline double Undulator::getaw(){
   return aw[istepz];
 }

@@ -69,7 +69,6 @@ bool Lattice::generateLattice(Setup *setup, AlterLattice *alt, Undulator *und)
   und->ku.resize(ndata);
   und->kx.resize(ndata);
   und->ky.resize(ndata);
-  und->ZR.resize(ndata);
   und->gradx.resize(ndata);
   und->grady.resize(ndata);
   und->qf.resize(ndata);
