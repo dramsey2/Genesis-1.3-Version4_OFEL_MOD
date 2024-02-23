@@ -291,10 +291,12 @@ double Undulator::faw2(double x, double y) {  // square of the transverse depend
     double y_norm = dy * sqrt(-kx[istepz]) / sqrt(2);
     double rsq_norm = y_norm * y_norm + x_norm * x_norm;
 
-    double aw_on_ax_factor = sqrt((1 + 5 * pow(z_norm, 2) + 4 * pow(z_norm, 4)) / (pow(1 + pow(z_norm, 2), 3)));
+    double factor_on_aw = sqrt((1 + 5 * pow(z_norm, 2) + 4 * pow(z_norm, 4)) / (pow(1 + pow(z_norm, 2), 3)));
     double f_actual = sqrt(exp(-2 * rsq_norm / (1 + pow(z_norm, 2))) * (pow((1 + rsq_norm), 2) + (5 - 4 * rsq_norm) * pow(z_norm, 2) + 4 * pow(z_norm, 4)) / (1 + 5 * pow(z_norm, 2) + 4 * pow(z_norm, 4)));
 
-    return pow(aw_on_ax_factor*f_actual,2); // note kx is scaled as XKX*ku*ku in Lattice.cpp, gradx as ku*GRADX.
+    // aw is going to be the axial value of aw therefore when aw*aw*faw*faw. f_actual aready includes this therefore it needs to be canceled from aw
+
+    return pow(f_actual/factor_on_aw,2); // note kx is scaled as XKX*ku*ku in Lattice.cpp, gradx as ku*GRADX.
 }
 
 double Undulator::faw(double x, double y) {  // transverse dependence of the undulator field.
@@ -305,10 +307,10 @@ double Undulator::faw(double x, double y) {  // transverse dependence of the und
     double y_norm = dy * sqrt(-kx[istepz]) / sqrt(2);
     double rsq_norm = y_norm * y_norm + x_norm * x_norm;
 
-    double aw_on_ax_factor = sqrt((1 + 5 * pow(z_norm, 2) + 4 * pow(z_norm, 4)) / (pow(1 + pow(z_norm, 2), 3)));
+    double factor_on_aw = sqrt((1 + 5 * pow(z_norm, 2) + 4 * pow(z_norm, 4)) / (pow(1 + pow(z_norm, 2), 3)));
     double f_actual = sqrt(exp(-2 * rsq_norm / (1 + pow(z_norm, 2))) * (pow((1 + rsq_norm), 2) + (5 - 4 * rsq_norm) * pow(z_norm, 2) + 4 * pow(z_norm, 4)) / (1 + 5 * pow(z_norm, 2) + 4 * pow(z_norm, 4)));
 
-    return aw_on_ax_factor * f_actual; // note kx is scaled as XKX*ku*ku in Lattice.cpp, gradx as ku*GRADX.
+    return f_actual / factor_on_aw; // note kx is scaled as XKX*ku*ku in Lattice.cpp, gradx as ku*GRADX.
 }
 
 
