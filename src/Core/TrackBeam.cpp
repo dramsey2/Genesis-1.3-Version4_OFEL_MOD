@@ -144,8 +144,8 @@ void TrackBeam::applyDQuad(double delz, double qf, double kx, double ku, double 
 
 	double xtmp_norm = xtmp / w0;
 	double ytmp_norm = ytmp / w0;
-	double dxdz_norm = (*px) / gammaz/w0;
-	double dydz_norm = (*py) / gammaz/w0;
+	double dxdz_norm = dxdz / w0;
+	double dydz_norm = dydz / w0;
 
 
 
@@ -156,7 +156,8 @@ void TrackBeam::applyDQuad(double delz, double qf, double kx, double ku, double 
 	double K2y = 0;
 
 	double exp_and_Arg = exp( - 2 * (xtmp_norm * xtmp_norm + ytmp_norm * ytmp_norm) / (1 + z_norm * z_norm));
-	double com = focsq * exp_and_Arg * (focsq * (pow(xtmp_norm, 2) + pow(xtmp_norm, 4) + pow(ytmp_norm, 2) + 2 * pow(xtmp_norm, 2) * pow(ytmp_norm, 2) + pow(ytmp_norm, 4) + (6 - 5 * pow(xtmp_norm, 2) - 5 * pow(ytmp_norm, 2)) * pow(z_norm, 2) + 6 * pow(z_norm, 4))) / pow(1 + pow(z_norm, 2), 4);
+	double com = focsq * exp_and_Arg * ((pow(xtmp_norm, 2) + pow(xtmp_norm, 4) + pow(ytmp_norm, 2) + 2 * pow(xtmp_norm, 2) * pow(ytmp_norm, 2) + pow(ytmp_norm, 4) + (6 - 5 * pow(xtmp_norm, 2) - 5 * pow(ytmp_norm, 2)) * pow(z_norm, 2) + 6 * pow(z_norm, 4))) / pow(1 + pow(z_norm, 2), 4);
+
 	K2dxdz += xtmp_norm * com;
 	K2dydz += ytmp_norm * com;
 	K2x += dxdz_norm;
@@ -180,7 +181,7 @@ void TrackBeam::applyDQuad(double delz, double qf, double kx, double ku, double 
 	K2y = 0;
 
 	exp_and_Arg = exp(-2 * (xtmp_norm * xtmp_norm + ytmp_norm * ytmp_norm) / (1 + z_norm * z_norm));
-	com = focsq * exp_and_Arg * (focsq * (pow(xtmp_norm, 2) + pow(xtmp_norm, 4) + pow(ytmp_norm, 2) + 2 * pow(xtmp_norm, 2) * pow(ytmp_norm, 2) + pow(ytmp_norm, 4) + (6 - 5 * pow(xtmp_norm, 2) - 5 * pow(ytmp_norm, 2)) * pow(z_norm, 2) + 6 * pow(z_norm, 4))) / pow(1 + pow(z_norm, 2), 4);
+	com = focsq * exp_and_Arg * ((pow(xtmp_norm, 2) + pow(xtmp_norm, 4) + pow(ytmp_norm, 2) + 2 * pow(xtmp_norm, 2) * pow(ytmp_norm, 2) + pow(ytmp_norm, 4) + (6 - 5 * pow(xtmp_norm, 2) - 5 * pow(ytmp_norm, 2)) * pow(z_norm, 2) + 6 * pow(z_norm, 4))) / pow(1 + pow(z_norm, 2), 4); , 4);
 	K2dxdz += xtmp_norm * com;
 	K2dydz += ytmp_norm * com;
 	K2x += dxdz_norm;
@@ -203,7 +204,7 @@ void TrackBeam::applyDQuad(double delz, double qf, double kx, double ku, double 
 	K2y *= -0.5;
 
 	exp_and_Arg = exp(-2 * (xtmp_norm * xtmp_norm + ytmp_norm * ytmp_norm) / (1 + z_norm * z_norm));
-	com = focsq * exp_and_Arg * (focsq * (pow(xtmp_norm, 2) + pow(xtmp_norm, 4) + pow(ytmp_norm, 2) + 2 * pow(xtmp_norm, 2) * pow(ytmp_norm, 2) + pow(ytmp_norm, 4) + (6 - 5 * pow(xtmp_norm, 2) - 5 * pow(ytmp_norm, 2)) * pow(z_norm, 2) + 6 * pow(z_norm, 4))) / pow(1 + pow(z_norm, 2), 4);
+	com = focsq * exp_and_Arg * ((pow(xtmp_norm, 2) + pow(xtmp_norm, 4) + pow(ytmp_norm, 2) + 2 * pow(xtmp_norm, 2) * pow(ytmp_norm, 2) + pow(ytmp_norm, 4) + (6 - 5 * pow(xtmp_norm, 2) - 5 * pow(ytmp_norm, 2)) * pow(z_norm, 2) + 6 * pow(z_norm, 4))) / pow(1 + pow(z_norm, 2), 4);
 	K2dxdz += xtmp_norm * com;
 	K2dydz += ytmp_norm * com;
 	K2x += dxdz_norm;
@@ -226,7 +227,7 @@ void TrackBeam::applyDQuad(double delz, double qf, double kx, double ku, double 
 	K2y *= 2;
 
 	exp_and_Arg = exp(-2 * (xtmp_norm * xtmp_norm + ytmp_norm * ytmp_norm) / (1 + z_norm * z_norm));
-	com = focsq * exp_and_Arg * (focsq * (pow(xtmp_norm, 2) + pow(xtmp_norm, 4) + pow(ytmp_norm, 2) + 2 * pow(xtmp_norm, 2) * pow(ytmp_norm, 2) + pow(ytmp_norm, 4) + (6 - 5 * pow(xtmp_norm, 2) - 5 * pow(ytmp_norm, 2)) * pow(z_norm, 2) + 6 * pow(z_norm, 4))) / pow(1 + pow(z_norm, 2), 4);
+	com = focsq * exp_and_Arg * ((pow(xtmp_norm, 2) + pow(xtmp_norm, 4) + pow(ytmp_norm, 2) + 2 * pow(xtmp_norm, 2) * pow(ytmp_norm, 2) + pow(ytmp_norm, 4) + (6 - 5 * pow(xtmp_norm, 2) - 5 * pow(ytmp_norm, 2)) * pow(z_norm, 2) + 6 * pow(z_norm, 4))) / pow(1 + pow(z_norm, 2), 4);
 	K2dxdz += xtmp_norm * com;
 	K2dydz += ytmp_norm * com;
 	K2x += dxdz_norm;
