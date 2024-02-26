@@ -4,13 +4,13 @@
 
 BeamSolver::BeamSolver()
 {
-  onlyFundamental=false;
+    onlyFundamental = false;
 }
 
-BeamSolver::~BeamSolver()= default;
+BeamSolver::~BeamSolver() = default;
 
 
-void BeamSolver::advance(double delz, Beam *beam, vector< Field *> *field, Undulator *und) {
+void BeamSolver::advance(double delz, Beam* beam, vector< Field*>* field, Undulator* und) {
 
     // here the harmonics needs to be taken into account
 
@@ -39,12 +39,15 @@ void BeamSolver::advance(double delz, Beam *beam, vector< Field *> *field, Undul
 
     double aw = und->getaw();
     double autophase = und->autophase();
+    z_pos = und->getz();
+
+
 
     // obtaining long range space charge field
     efield.longRange(beam, und->getGammaRef(), aw);  // defines the array beam->longESC
 
     // Runge Kutta solver to advance particle
-    auto gammaz2 = und->getGammaRef()*und->getGammaRef()/(1+aw*aw);
+    auto gammaz2 = und->getGammaRef() * und->getGammaRef() / (1 + aw * aw);
     for (int is = 0; is < beam->beam.size(); is++) {
         // accumulate space charge field
         double eloss = -beam->longESC[is] / 511000; // convert eV to units of electron rest mass
@@ -74,7 +77,8 @@ void BeamSolver::advance(double delz, Beam *beam, vector< Field *> *field, Undul
                     idx++;
                     cpart += field->at(nfld[ifld])->field[islice].at(idx) * (1 - wx) * (1 - wy);
                     rpart[ifld] = rtmp[ifld] * awloc * conj(cpart);
-                } else {
+                }
+                else {
                     rpart[ifld] = 0;
                 }
             }
@@ -94,7 +98,7 @@ void BeamSolver::RungeKutta(double delz) {
     k2gg = 0;
     k2pp = 0;
 
-    this->ODE(gamma, theta);
+    this->ODE(gamma, theta, z_pos);
 
     // second step
     double stpz = 0.5 * delz;
@@ -108,7 +112,7 @@ void BeamSolver::RungeKutta(double delz) {
     k2gg = 0;
     k2pp = 0;
 
-    this->ODE(gamma, theta);
+    this->ODE(gamma, theta, z_pos + stpz);
 
     // third step
     gamma += stpz * (k2gg - k3gg);
@@ -120,7 +124,7 @@ void BeamSolver::RungeKutta(double delz) {
     k2gg *= -0.5;
     k2pp *= -0.5;
 
-    this->ODE(gamma, theta);
+    this->ODE(gamma, theta, z_pos + stpz);
 
     // fourth step
     stpz = delz;
@@ -134,14 +138,14 @@ void BeamSolver::RungeKutta(double delz) {
     k2gg *= 2;
     k2pp *= 2;
 
-    this->ODE(gamma, theta);
+    this->ODE(gamma, theta, z_pos + stpz);
     gamma += stpz * (k3gg + k2gg / 6.0);
     theta += stpz * (k3pp + k2pp / 6.0);
 
 }
 
 
-void BeamSolver::ODE(double tgam,double tthet) {
+void BeamSolver::ODE(double tgam, double tthet, double z) {
 
     // differential equation for longitudinal motion
     double ztemp1 = -2. / xks;
@@ -153,12 +157,14 @@ void BeamSolver::ODE(double tgam,double tthet) {
     double btpar0 = sqrt(1. - btper0 / (tgam * tgam));     //parallel velocity
 #ifdef G4_DBGDIAG
     // CL: detect negative radicands as NaN theta values can be the result
-    double btpar0_sq=1.-btper0/(tgam*tgam);     //(parallel velocity)^2
-    if(btpar0_sq<0) {
-      cout << "DBGDIAG(BeamSolver::ODE): error, negative radicand detected" << endl;
+    double btpar0_sq = 1. - btper0 / (tgam * tgam);     //(parallel velocity)^2
+    if (btpar0_sq < 0) {
+        cout << "DBGDIAG(BeamSolver::ODE): error, negative radicand detected" << endl;
     }
 #endif
-    k2pp += xks * (1. - 1. / btpar0) + xku;             //dtheta/dz
+    double deltak_over_k0 = 3.7 * pow(10, -4); // Shift from initial
+    double FR = 1.7 * pow(10, -2);   // focal range
+    k2pp += xks * (1. - 1. / btpar0) + xku + 8*xku*deltak_over_k0/FR*z_pos - 12*xku*deltak_over_k0/(FR*FR)*z_pos*z_pos;             //dtheta/dz
     k2gg += ctmp.imag() / btpar0 / tgam - ez;         //dgamma/dz
 }
 
