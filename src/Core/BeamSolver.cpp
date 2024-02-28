@@ -162,9 +162,13 @@ void BeamSolver::ODE(double tgam, double tthet, double z) {
         cout << "DBGDIAG(BeamSolver::ODE): error, negative radicand detected" << endl;
     }
 #endif
-    double deltak_over_k0 = 3.7 * pow(10, -4); // Shift from initial
+    /*double deltak_over_k0 = 3.7 * pow(10, -4); // Shift from initial
     double FR = 1.7 * pow(10, -2);   // focal range
     k2pp += xks * (1. - 1. / btpar0) + xku + 8*xku*deltak_over_k0/FR*z_pos - 12*xku*deltak_over_k0/(FR*FR)*z_pos*z_pos;             //dtheta/dz
+    k2gg += ctmp.imag() / btpar0 / tgam - ez;         //dgamma/dz
+    */
+    double focal_length = 1; // Shift from initial
+    k2pp += xks * (1. - 1. / btpar0) + xku + xku*z_pos/focal_length;             //dtheta/dz
     k2gg += ctmp.imag() / btpar0 / tgam - ez;         //dgamma/dz
 }
 
