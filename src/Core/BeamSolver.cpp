@@ -2,6 +2,8 @@
 #include "Field.h"
 #include "Beam.h"
 
+// Testing VS code commit
+
 BeamSolver::BeamSolver()
 {
     onlyFundamental = false;
