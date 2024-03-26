@@ -11,7 +11,7 @@ BeamSolver::BeamSolver()
 BeamSolver::~BeamSolver() = default;
 
 
-void BeamSolver::advance(double delz, Beam* beam, vector< Field*>* field, Undulator* und, EFieldSolver efield) {
+void BeamSolver::advance(double delz, Beam* beam, vector< Field*>* field, Undulator* und) {
 
     // here the harmonics needs to be taken into account
 
@@ -178,7 +178,7 @@ void BeamSolver::ODE(double tgam, double tthet, double z) {
 
 }
 
-//void BeamSolver::checkAllocation(unsigned long nslice) {
-//    efield.allocateForOutput(nslice);
-//}
+void BeamSolver::checkAllocation(unsigned long nslice) {
+    efield.allocateForOutput(nslice);
+}
 

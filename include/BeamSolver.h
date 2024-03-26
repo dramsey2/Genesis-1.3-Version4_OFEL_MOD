@@ -13,7 +13,7 @@ class Field;
 
 #include "Undulator.h"
 #include "EFieldSolver.h"
-//#include "TrackBeam.h"
+#include "TrackBeam.h"
 
 
 
@@ -24,12 +24,12 @@ class BeamSolver {
 public:
     BeamSolver();
     virtual ~BeamSolver();
-    //void initEField(double rmax, int ngrid, int nz, int nphi, double lambda, bool longr);
-    void advance(double, Beam*, vector<Field*>*, Undulator*, EFieldSolver);
-    //void track(double, Beam*, Undulator*, bool, EFieldSolver*);
-    //void applyR56(Beam*, Undulator*, double);
+    void initEField(double rmax, int ngrid, int nz, int nphi, double lambda, bool longr);
+    void advance(double, Beam*, vector<Field*>*, Undulator*);
+    void track(double, Beam*, Undulator*, bool);
+    void applyR56(Beam*, Undulator*, double);
     double getSCField(int);
-    //void checkAllocation(unsigned long i);
+    void checkAllocation(unsigned long i);
 
 private:
     complex<double> cpart;
@@ -47,28 +47,28 @@ private:
     void RungeKutta(double);
     void ODE(double, double, double);
 
-    //EFieldSolver efield;
-    //TrackBeam tracker;
+    EFieldSolver efield;
+    TrackBeam tracker;
 
 };
 
-//inline double BeamSolver::getSCField(int islice) {
-//    return efield.getSCField(islice);
-//}
+inline double BeamSolver::getSCField(int islice) {
+    return efield.getSCField(islice);
+}
 
-//inline void BeamSolver::initEField(double rmax, int ngrid, int nz, int nphi, double lambda, bool longr) {
-////    efield.init(rmax, ngrid, nz, nphi, lambda, longr);
-//}
+inline void BeamSolver::initEField(double rmax, int ngrid, int nz, int nphi, double lambda, bool longr) {
+    efield.init(rmax, ngrid, nz, nphi, lambda, longr);
+}
 
 
-//inline void BeamSolver::track(double dz, Beam* beam, Undulator* und, bool last, EFieldSolver* efield)
-//{
-//    tracker.track(dz, beam, und, last, efield);
-//}
+inline void BeamSolver::track(double dz, Beam* beam, Undulator* und, bool last)
+{
+    tracker.track(dz, beam, und, efield, last);
+}
 
-//inline void BeamSolver::applyR56(Beam* beam, Undulator* und, double reflen) {
-//    tracker.applyR56(beam, und, reflen);
-//}
+inline void BeamSolver::applyR56(Beam* beam, Undulator* und, double reflen) {
+    tracker.applyR56(beam, und, reflen);
+}
 
 
 #endif

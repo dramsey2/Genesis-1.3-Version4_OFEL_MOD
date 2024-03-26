@@ -8,11 +8,9 @@
 #include "Particle.h"
 #include "Undulator.h"
 #include "BeamSolver.h"
-#include "EFieldSolver.h"
 #include "Incoherent.h"
 #include "Sorting.h"
 #include "Collective.h"
-#include "TrackBeam.h"
 
 using namespace std;
 
@@ -23,8 +21,6 @@ class Beam{
    Beam();
    virtual ~Beam();
    void init(int, int, double,double, double,bool);
-   void applyR56(Beam*, Undulator*, double);
-   void checkAllocation(unsigned long i);
    void initSorting(int,int,bool,bool);
    void initEField(double,int,int,int,double,bool);
    void initIncoherent(int, int, bool,bool);
@@ -73,12 +69,9 @@ class Beam{
 
    //global values
    vector<double> tgavg, tgsig, txavg,txsig,tyavg, tysig,tbun;  // global values, averaging over the entire beam 
-   EFieldSolver efield;
 
  private:
-   BeamSolver LongSolver;
-   TrackBeam  TransSolver;
-
+   BeamSolver solver;
    Incoherent incoherent;
    Collective col;
    Sorting sorting;
@@ -96,7 +89,7 @@ class Beam{
 
 // check allocated memory
 inline void Beam::checkBeforeTracking() {
-    efield.allocateForOutput(this->beam.size());
+    solver.checkAllocation(this->beam.size());
 }
 
 
@@ -105,16 +98,12 @@ inline bool Beam::outputSpatial(){ return doSpatial;}
 inline bool Beam::outputEnergy(){ return doEnergy;}
 inline bool Beam::outputAux(){ return doAux;}
 
-inline void Beam::applyR56(Beam* beam, Undulator* und, double reflen) {
-    TransSolver.applyR56(beam, und, reflen);
-}
-
 inline void Beam::initIncoherent(int base, int rank, bool spread, bool loss){
   incoherent.init(base,rank,spread,loss);
 }
 
 inline void Beam::initEField(double rmax, int ngrid, int nz, int nphi, double lambda, bool lngr){
-  efield.init(rmax, ngrid, nz, nphi, lambda, lngr);
+  solver.initEField(rmax,ngrid,nz,nphi,lambda,lngr);
 }
 
 inline void Beam::initWake(unsigned int ns, unsigned int nsNode, double ds, double *wakeext, double *wakeres, double *wakegeo,double *wakerou, double ztrans, double radius, bool transient){
@@ -122,7 +111,7 @@ inline void Beam::initWake(unsigned int ns, unsigned int nsNode, double ds, doub
 }
 
 inline bool Beam::hasWake(){return col.hasWakeDefined();}
-inline double Beam::getSCField(int islice) {return efield.getSCField(islice);}
+inline double Beam::getSCField(int islice) {return solver.getSCField(islice);}
 
 
 inline void Beam::setBunchingHarmonicOutput(int harm_in){bharm=harm_in;}

@@ -99,16 +99,16 @@ void Beam::track(double delz,vector<Field *> *field, Undulator *und){
     ifld->setStepsize(delz);
   }
 
-  TransSolver.track(delz*0.5,this,und,efield,false);   // track transverse coordinates first half of integration step
+  solver.track(delz*0.5,this,und, false);   // track transverse coordinates first half of integration step
 
-  LongSolver.advance(delz,this,field, und, efield);     // advance longitudinal variables 
+  solver.advance(delz,this,field, und);     // advance longitudinal variables 
 
   incoherent.apply(this,und,delz);         // apply effect of incoherent synchrotron
   col.apply(this,und,delz);         // apply effect of collective effects
 
-  applyR56(this,und,reflength);    // apply the longitudinal phase shift due to R56 if a chicane is selected.
+  solver.applyR56(this,und,reflength);    // apply the longitudinal phase shift due to R56 if a chicane is selected.
 
-  TransSolver.track(delz*0.5,this,und,efield, true);      }
+  solver.track(delz*0.5,this,und, true);      }
 
 
 
@@ -297,9 +297,6 @@ bool Beam::subharmonicConversion(int harmonic, bool resample)
   return true;
 }
 
-void Beam::checkAllocation(unsigned long nslice) {
-    efield.allocateForOutput(nslice);
-}
 
 
 
