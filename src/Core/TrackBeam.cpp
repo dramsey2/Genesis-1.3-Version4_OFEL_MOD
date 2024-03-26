@@ -1,11 +1,13 @@
 #include "TrackBeam.h"
+#include "Field.h"
 #include "Beam.h"
+
 
 TrackBeam::TrackBeam(){}
 TrackBeam::~TrackBeam(){}
 
 
-void TrackBeam::track(double delz, Beam *beam,Undulator *und,bool lastStep=true)
+void TrackBeam::track(double delz, Beam *beam,Undulator *und, EFieldSolver efield, bool lastStep=true)
 {
 
   // get undulator parameter for the given step
@@ -19,6 +21,7 @@ void TrackBeam::track(double delz, Beam *beam,Undulator *und,bool lastStep=true)
   und->getQuadrupoleParameters(&qf,&dqx,&dqy);
   und->getCorrectorParameters(&cx,&cy);
   und->getChicaneParameters(&angle,&lb,&ld,&lt);
+
 
   double betpar0=sqrt(1-(1+aw*aw)/gamma0/gamma0);
   
@@ -63,15 +66,21 @@ void TrackBeam::track(double delz, Beam *beam,Undulator *und,bool lastStep=true)
     }
   }
 
-  for (int i=0; i<beam->beam.size();i++){
-    for (int j=0; j<beam->beam.at(i).size();j++){
-      Particle *p=&beam->beam.at(i).at(j);
-      double gammaz=sqrt(p->gamma*p->gamma-1- aw*aw - p->px*p->px - p->py*p->py); // = gamma*betaz=gamma*(1-(1+aw*aw)/gamma^2);
+  for (int i = 0; i < beam->beam.size(); i++)
+  {
+    efield.shortRange(&beam->beam.at(i), beam->current.at(i), sqrt(1/(1-betpar0*betpar0)), i);
+
+    for (int j = 0; j < beam->beam.at(i).size(); j++)
+    {
+      Particle *p = &beam->beam.at(i).at(j);
+      er = efield.getERField(j);
+
+      double gammaz = sqrt(p->gamma * p->gamma - 1 - aw * aw - p->px * p->px - p->py * p->py); // = gamma*betaz=gamma*(1-(1+aw*aw)/gamma^2);
 #ifdef G4_DBGDIAG
 // G4_DBGDIAG: add test against negative radicand? Note that the particles probably already made lots of noise elsewhere.
 #endif
       (this->*ApplyX)(delz,qx, kx, &(p->x), &(p->y), &(p->px), &(p->py), gammaz, xoff);
-	  //Do not apply Y. It will be updated in ApplyX through the rk4
+	    // Do not apply Y. It will be updated in ApplyX through the RK4
       //(this->*ApplyY)(delz,qy, ky, &(p->y), x_temp, &(p->py),gammaz,yoff);
     }
   }
@@ -119,105 +128,110 @@ void TrackBeam::applyDQuad(double delz, double qf, double kx, double* x, double*
 
 void TrackBeam::applyDQuad(double delz, double qf, double kx, double* x, double* y, double* px, double* py, double gammaz, double dx)
 {
-	// ensure q is negated
+  double betpar0 = sqrt(1-1/(gammaz*gammaz));
+
 	double focsq = -1*qf / gammaz;
-	double dxdz = (*px) / gammaz;
-	double dydz = (*py) / gammaz;
+	double dxgdz = (*px);
+	double dygdz = (*py);
 	double xtmp = (*x);
 	double ytmp = (*y);
 
 
-
 	// first step
-	double K2dxdz = 0;
-	double K2dydz = 0;
+	double K2dxgdz = 0;
+	double K2dygdz = 0;
 	double K2x = 0;
 	double K2y = 0;
 
 	double kxrsq = kx * (xtmp * xtmp + ytmp * ytmp);
-	K2dxdz += focsq * kxrsq * (kxrsq - 2) * xtmp * exp(kxrsq) / 4;
-	K2dydz += focsq * kxrsq * (kxrsq - 2) * ytmp * exp(kxrsq) / 4;
-	K2x += dxdz;
-	K2y += dydz;
+  double angle = atan2(ytmp,xtmp);
+	K2dxgdz += gammaz*focsq * kxrsq * (kxrsq - 2) * xtmp * exp(kxrsq) / 4/betpar0 - (1-betpar0*betpar0)*er*cos(angle)/betpar0;
+	K2dygdz += gammaz*focsq * kxrsq * (kxrsq - 2) * ytmp * exp(kxrsq) / 4/betpar0 - (1-betpar0*betpar0)*er*sin(angle)/betpar0;
+	K2x += dxgdz/gammaz;
+	K2y += dygdz/gammaz;
 
 
 	// second step
-	dxdz += 0.5 * delz * K2dxdz;
-	dydz += 0.5 * delz * K2dydz;
+	dxgdz += 0.5 * delz * K2dxgdz;
+	dygdz += 0.5 * delz * K2dygdz;
 	xtmp += 0.5 * delz * K2x;
 	ytmp += 0.5 * delz * K2y;
 
-	double K3dxdz = K2dxdz;
-	double K3dydz = K2dydz;
+	double K3dxgdz = K2dxgdz;
+	double K3dygdz = K2dygdz;
 	double K3x = K2x;
 	double K3y = K2y;
 
-	K2dxdz = 0;
-	K2dydz = 0;
+	K2dxgdz = 0;
+	K2dygdz = 0;
 	K2x = 0;
 	K2y = 0;
 
 	kxrsq = kx * (xtmp * xtmp + ytmp * ytmp);
-	K2dxdz += focsq * kxrsq * (kxrsq - 2) * xtmp * exp(kxrsq) / 4;
-	K2dydz += focsq * kxrsq * (kxrsq - 2) * ytmp * exp(kxrsq) / 4;
-	K2x += dxdz;
-	K2y += dydz;
+  angle = atan2(ytmp,xtmp);
+	K2dxgdz += gammaz*focsq * kxrsq * (kxrsq - 2) * xtmp * exp(kxrsq) / 4/betpar0 - (1-betpar0*betpar0)*er*cos(angle)/betpar0;
+	K2dygdz += gammaz*focsq * kxrsq * (kxrsq - 2) * ytmp * exp(kxrsq) / 4/betpar0 - (1-betpar0*betpar0)*er*sin(angle)/betpar0;
+	K2x += dxgdz/gammaz;
+	K2y += dygdz/gammaz;
 
 	// third step
-	dxdz += 0.5 * delz * (K2dxdz - K3dxdz);
-	dydz += 0.5 * delz * (K2dydz - K3dydz);
+	dxgdz += 0.5 * delz * (K2dxgdz - K3dxgdz);
+	dygdz += 0.5 * delz * (K2dygdz - K3dygdz);
 	xtmp += 0.5 * delz * (K2x - K3x);
 	ytmp += 0.5 * delz * (K2y - K3y);
 
-	K3dxdz /= 6;
-	K3dydz /= 6;
+	K3dxgdz /= 6;
+	K3dygdz /= 6;
 	K3x /= 6;
 	K3y /= 6;
 
-	K2dxdz *= -0.5;
-	K2dydz *= -0.5;
+	K2dxgdz *= -0.5;
+	K2dygdz *= -0.5;
 	K2x *= -0.5;
 	K2y *= -0.5;
 
 	kxrsq = kx * (xtmp * xtmp + ytmp * ytmp);
-	K2dxdz += focsq * kxrsq * (kxrsq - 2) * xtmp * exp(kxrsq) / 4;
-	K2dydz += focsq * kxrsq * (kxrsq - 2) * ytmp * exp(kxrsq) / 4;
-	K2x += dxdz;
-	K2y += dydz;
+  angle = atan2(ytmp,xtmp);
+	K2dxgdz += gammaz*focsq * kxrsq * (kxrsq - 2) * xtmp * exp(kxrsq) / 4/betpar0 - (1-betpar0*betpar0)*er*cos(angle)/betpar0;
+	K2dygdz += gammaz*focsq * kxrsq * (kxrsq - 2) * ytmp * exp(kxrsq) / 4/betpar0 - (1-betpar0*betpar0)*er*sin(angle)/betpar0;
+	K2x += dxgdz/gammaz;
+	K2y += dygdz/gammaz;
 
 	// fourth step
-	dxdz += delz * K2dxdz;
-	dydz += delz * K2dydz;
+	dxgdz += delz * K2dxgdz;
+	dygdz += delz * K2dygdz;
 	xtmp += delz * K2x;
 	ytmp += delz * K2y;
 
-	K3dxdz -= K2dxdz;
-	K3dydz -= K2dydz;
+	K3dxgdz -= K2dxgdz;
+	K3dygdz -= K2dygdz;
 	K3x -= K2x;
 	K3y -= K2y;
 
-	K2dxdz *= 2;
-	K2dydz *= 2;
+	K2dxgdz *= 2;
+	K2dygdz *= 2;
 	K2x *= 2;
 	K2y *= 2;
 
 	kxrsq = kx * (xtmp * xtmp + ytmp * ytmp);
-	K2dxdz += focsq * kxrsq * (kxrsq - 2) * xtmp * exp(kxrsq) / 4;
-	K2dydz += focsq * kxrsq * (kxrsq - 2) * ytmp * exp(kxrsq) / 4;
-	K2x += dxdz;
-	K2y += dydz;
+  angle = atan2(ytmp,xtmp);
+	K2dxgdz += gammaz*focsq * kxrsq * (kxrsq - 2) * xtmp * exp(kxrsq) / 4/betpar0 - (1-betpar0*betpar0)*er*cos(angle)/betpar0;
+	K2dygdz += gammaz*focsq * kxrsq * (kxrsq - 2) * ytmp * exp(kxrsq) / 4/betpar0 - (1-betpar0*betpar0)*er*sin(angle)/betpar0;
+	K2x += dxgdz/gammaz;
+	K2y += dygdz/gammaz;
 
-	dxdz += delz * (K3dxdz + K2dxdz / 6);
-	dydz += delz * (K3dydz + K2dydz / 6);
-	xtmp += delz * (K3x + K2x / 6);
-	ytmp += delz * (K3y + K2y / 6);
+	dxgdz += delz * (K3dxgdz + K2dxgdz / 6.0);
+	dygdz += delz * (K3dygdz + K2dygdz / 6.0);
+	xtmp += delz * (K3x + K2x / 6.0);
+	ytmp += delz * (K3y + K2y / 6.0);
 
 
 	// pass out
-	*px = gammaz * dxdz;
-	*py = gammaz * dydz;
+	*px = dxgdz;
+	*py = dygdz;
 	*x = xtmp;
 	*y = ytmp;
+
 
   return;
 }
