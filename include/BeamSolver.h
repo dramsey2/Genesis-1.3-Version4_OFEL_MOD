@@ -36,7 +36,7 @@ private:
     vector<double> rharm;
     vector<complex<double> > rpart;
 
-    double ez{},er{};
+    double ez{},er{}, betPhase{};
     double xks{}, xku{};
 
     double theta{}, gamma{}, btpar{}, z_pos{}, pxtmp{}, pytmp{};

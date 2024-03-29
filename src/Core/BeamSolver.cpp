@@ -52,6 +52,12 @@ void BeamSolver::advance(double delz, Beam* beam, vector< Field*>* field, Undula
         // accumulate space charge field
         double eloss = -beam->longESC[is] / 511000; // convert eV to units of electron rest mass
         efield.shortRange(&beam->beam.at(is), beam->current.at(is), gammaz2, is); // er and ez are calculated
+
+        double rmsBradius_sq = beam->getSize(is); // for some reason this is the rms^2
+        double omegapDiv_c_sq = vacimp * (beam->current.at(is)) / rmsBradius_sq / eev;
+        betPhase = sqrt(1 + 4 * omegapDiv_c_sq  / xku / xku / (und->getGammaRef()));
+        cout<<betPhase<<endl;
+
         for (int ip = 0; ip < beam->beam.at(is).size(); ip++) {
             gamma = beam->beam.at(is).at(ip).gamma;
             theta = beam->beam.at(is).at(ip).theta + autophase; // add autophase here
@@ -172,8 +178,7 @@ void BeamSolver::ODE(double tgam, double tthet, double z) {
     }
 #endif
     double focal_length = 1; // should be about 1 meter
-
-    k2pp += xks * (1. - 1. / btpar0) + xku + xku*z/focal_length;                                                   //dtheta/dz
+    k2pp += xks * (1. - 1. / btpar0) + xku + (betPhase/btpar0 -1)*xku/2 + xku*z/focal_length;                                                   //dtheta/dz
     k2gg += ctmp.imag() / btpar0 / tgam - ez - er*sqrt(pxtmp*pxtmp + pytmp*pytmp)/tgam/btpar0;                    //dgamma/dz
 
 }
