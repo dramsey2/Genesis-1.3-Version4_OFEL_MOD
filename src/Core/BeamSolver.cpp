@@ -52,6 +52,11 @@ void BeamSolver::advance(double delz, Beam *beam, vector< Field *> *field, Undul
     for (int is = 0; is < beam->beam.size(); is++) {
         // accumulate space charge field
         double eloss = -beam->longESC[is] / 511000; // convert eV to units of electron rest mass
+
+        double rmsBradius = beam->getSize(is);
+        double omegapDiv_c_sq = vacimp * (beam->current.at(is)) / rmsBradius / rmsBradius / eev;
+        betPhase = sqrt(1 + 4 * omegapDiv_c_sq  / xku / xku / (und->getGammaRef()));
+
         efield.shortRange(&beam->beam.at(is), beam->current.at(is), gammaz2, is);
         for (int ip = 0; ip < beam->beam.at(is).size(); ip++) {
             gamma = beam->beam.at(is).at(ip).gamma;
@@ -67,6 +72,7 @@ void BeamSolver::advance(double delz, Beam *beam, vector< Field *> *field, Undul
 
             pxtmp = px;
             pytmp = py;
+            rtmp_sq = x*x + y*y;
 
             cpart = 0;
             double wx, wy;
@@ -167,7 +173,8 @@ void BeamSolver::ODE(double tgam,double tthet, double z) {
       cout << "DBGDIAG(BeamSolver::ODE): error, negative radicand detected" << endl;
     }
 #endif
-    k2pp += xks * (1. - 1. / btpar0) + xku + ZR / (z * z + ZR * ZR);             //dtheta/dz
+    k2pp += xks * (1. - 1. / btpar0) + xku + xku / 2 * (betPhase / btpar0 - 1) - xku / 4 * rtmp_sq * (z * z - ZR * ZR) / (z * z + ZR * ZR) / (z * z + ZR * ZR) - ZR / (z * z + ZR * ZR); // dtheta/dz
+
     k2gg += ctmp.imag() / btpar0 / tgam - ez - er*sqrt(pxtmp*pxtmp + pytmp*pytmp)/tgam/btpar0;         //dgamma/dz
 }
 

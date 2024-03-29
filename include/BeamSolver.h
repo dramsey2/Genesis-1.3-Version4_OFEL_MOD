@@ -39,7 +39,7 @@ private:
     double ez{}, er{};
     double xks{}, xku{};
 
-    double theta{}, gamma{}, btpar{}, ZR{}, z_pos{}, pxtmp{}, pytmp{};
+    double theta{}, gamma{}, btpar{}, ZR{}, z_pos{}, pxtmp{}, pytmp{}, rtmp_sq{}, betPhase{};
     double k2gg{}, k2pp{}, k3gg{}, k3pp{};
 
     bool onlyFundamental;
