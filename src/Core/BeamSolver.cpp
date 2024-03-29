@@ -53,8 +53,8 @@ void BeamSolver::advance(double delz, Beam *beam, vector< Field *> *field, Undul
         // accumulate space charge field
         double eloss = -beam->longESC[is] / 511000; // convert eV to units of electron rest mass
 
-        double rmsBradius = beam->getSize(is);
-        double omegapDiv_c_sq = vacimp * (beam->current.at(is)) / rmsBradius / rmsBradius / eev;
+        double rmsBradius_sq = beam->getSize(is);
+        double omegapDiv_c_sq = vacimp * (beam->current.at(is)) / rmsBradius_sq / eev;
         betPhase = sqrt(1 + 4 * omegapDiv_c_sq  / xku / xku / (und->getGammaRef()));
 
         efield.shortRange(&beam->beam.at(is), beam->current.at(is), gammaz2, is);
