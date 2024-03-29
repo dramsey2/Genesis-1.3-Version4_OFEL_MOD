@@ -23,7 +23,7 @@ void TrackBeam::track(double delz, Beam *beam,Undulator *und, EFieldSolver efiel
   und->getChicaneParameters(&angle,&lb,&ld,&lt);
 
 
-  double betpar0=sqrt(1-(1+aw*aw)/gamma0/gamma0);
+  betpar0=sqrt(1-(1+aw*aw)/gamma0/gamma0);
   
   // effective focusing in x and y with the correct energy dependence
   double qquad=qf*gamma0;
@@ -74,8 +74,13 @@ void TrackBeam::track(double delz, Beam *beam,Undulator *und, EFieldSolver efiel
     {
       Particle *p = &beam->beam.at(i).at(j);
       er = efield.getERField(j);
+      double awsq_at_p =  (und->faw(p->x, p->y))*(und->faw(p->x, p->y))*aw*aw; // should use the value of aw where the electron is
+      //double gammaz = sqrt(p->gamma * p->gamma - 1 - aw * aw - p->px * p->px - p->py * p->py); // = gamma*betaz=gamma*(1-(1+aw*aw)/gamma^2);
+      double gammaz = sqrt(p->gamma * p->gamma - 1 - awsq_at_p - p->px * p->px - p->py * p->py); // = gamma*betaz=gamma*(1-(1+aw*aw)/gamma^2);
+      betpar0 = gammaz/(p->gamma);
+      // use particle numbers
+      qx = kx * aw * aw / (p->gamma)/ betpar0; // kx has already the scaling with ku^2
 
-      double gammaz = sqrt(p->gamma * p->gamma - 1 - aw * aw - p->px * p->px - p->py * p->py); // = gamma*betaz=gamma*(1-(1+aw*aw)/gamma^2);
 #ifdef G4_DBGDIAG
 // G4_DBGDIAG: add test against negative radicand? Note that the particles probably already made lots of noise elsewhere.
 #endif
@@ -128,8 +133,6 @@ void TrackBeam::applyDQuad(double delz, double qf, double kx, double* x, double*
 
 void TrackBeam::applyDQuad(double delz, double qf, double kx, double* x, double* y, double* px, double* py, double gammaz, double dx)
 {
-  double betpar0 = sqrt(1-1/(gammaz*gammaz));
-
 	double focsq = -1*qf / gammaz;
 	double dxgdz = (*px);
 	double dygdz = (*py);

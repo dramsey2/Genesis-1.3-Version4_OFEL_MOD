@@ -33,7 +33,7 @@ class TrackBeam{
 
  private:
 
-   double er{};
+   double er{}, betpar0{};
    void matmul(double a[][4], double b[][4]);
 
 };
