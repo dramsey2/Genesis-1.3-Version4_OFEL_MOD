@@ -56,7 +56,7 @@ void BeamSolver::advance(double delz, Beam* beam, vector< Field*>* field, Undula
         double rmsBradius_sq = beam->getSize(is); // for some reason this is the rms^2
         double omegapDiv_c_sq = vacimp * (beam->current.at(is)) / rmsBradius_sq / eev;
         betPhase = sqrt(1 + 4 * omegapDiv_c_sq  / xku / xku / (und->getGammaRef()));
-        cout<<betPhase<<endl;
+        //cout<<betPhase<<endl;
 
         for (int ip = 0; ip < beam->beam.at(is).size(); ip++) {
             gamma = beam->beam.at(is).at(ip).gamma;
