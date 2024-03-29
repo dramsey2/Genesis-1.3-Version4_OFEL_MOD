@@ -45,6 +45,7 @@ void EFieldSolver::init(double rmax_in, int ngrid_in, int nz_in, int nphi_in, do
         celm.resize(ngrid);
         csrc.resize(ngrid);
         gam.resize(ngrid);
+        srcR.resize(ngrid);
     }
 }
 
@@ -190,14 +191,21 @@ double EFieldSolver::getEField(unsigned long i)
     return ez[i];
 }
 
+double EFieldSolver::getERField(unsigned long i)
+{
+    return er[i];
+}
+
 void EFieldSolver::shortRange(vector<Particle> *beam, double current, double gz2, int islice) {
 
     auto npart = beam->size();
     if (npart > ez.size()){
         ez.resize(npart);
+        er.resize(npart);
     }
     for (int i =0; i < npart; i++){
         ez[i] = 0;
+        er[i] = 0;
     }
     efield[islice] = 0;
 
@@ -212,6 +220,34 @@ void EFieldSolver::shortRange(vector<Particle> *beam, double current, double gz2
     auto pi = 2*asin(1);
     auto coef = -gz2/ks/ks;      // equivalent to 1/[k^2-(k+ku)^2] from fortran code.
     auto econst = vacimp/eev*current/ks/static_cast<double>(npart);
+    auto erconst = -vacimp/eev*current/static_cast<double>(npart);
+
+    //* Transverse Field calculation *//
+    // clear source
+    for (int i = 0; i < ngrid; i++)
+    {
+        srcR[i] = 0;
+    }
+    // build source
+    for (int i = 0; i < npart; i++)
+    {
+        srcR[idxr[i]] += erconst * (dr * (0.5 + idxr[i])) / vol[idxr[i]]; // the resulting field will be in units 1/length
+    }
+    // Integrate
+    double csum = 0;
+    for (int i = 0; i < ngrid; i++)
+    {
+        srcR[i] = (i == 0) ? (srcR[i]) : (csum + srcR[i]); 
+        csum = srcR[i];
+    }
+    // store
+    for (int i = 0; i < npart; i++)
+    {
+        er[i] = srcR[idxr[i]] / (0.5 + idxr[i]); 
+    }
+
+
+
     for (int m = -nphi; m <=nphi; m++){  // loop over azimutal modes
         for (int i = 0; i < ngrid; i++){
             lmid[i] = -ldig[i] - ldig[i+1] - 2.*pi*m*m*rlog[i];

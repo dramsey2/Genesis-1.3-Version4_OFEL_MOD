@@ -55,6 +55,7 @@ bool Lattice::generateLattice(Setup *setup, AlterLattice *alt, Undulator *und)
   double lambda=setup->getReferenceLength();
   double gamma=setup->getReferenceEnergy();
   double ZR_temp ; // Declaration of Rayleigh length
+  double z_norm;
 
   this->unrollLattice(delz);
   this->calcSlippage(lambda,gamma);
@@ -91,15 +92,17 @@ bool Lattice::generateLattice(Setup *setup, AlterLattice *alt, Undulator *und)
   for (int i=0; i<ndata;i++){
 
       ZR_temp = -lat_ku[0] / (2 * lat_kx[0]);
-      und->aw[i]=lat_aw[i]/sqrt(1 + lat_z[i]*lat_z[i]/(ZR_temp*ZR_temp));
+      z_norm = -lat_z[i]/lat_ku[0] * (2 * lat_kx[0]);
+      //*3/26/2024//und->aw[i]=lat_aw[i]/sqrt(1 + lat_z[i]*lat_z[i]/(ZR_temp*ZR_temp));
+      und->aw[i]=lat_aw[i]/sqrt(1 + z_norm*z_norm);
       //und->aw[i]=lat_aw[i];
       und->ax[i]=lat_ax[i];
       und->ay[i]=lat_ay[i];
       und->ku[i]=lat_ku[i];
-      //und->kx[i]=lat_kx[i];
-      //und->ky[i]=lat_ky[i];
-      und->kx[i] = lat_kx[i]/(1 + lat_z[i] * lat_z[i] / (ZR_temp * ZR_temp));
-      und->ky[i] = lat_ky[i]/ (1 + lat_z[i] * lat_z[i] / (ZR_temp * ZR_temp));
+      und->kx[i]=lat_kx[i];
+      und->ky[i]=lat_ky[i];
+       //*3/26/2024//und->kx[i] = lat_kx[i]/(1 + lat_z[i] * lat_z[i] / (ZR_temp * ZR_temp));
+       //*3/26/2024//und->ky[i] = lat_ky[i]/ (1 + lat_z[i] * lat_z[i] / (ZR_temp * ZR_temp));
       und->ZR[i] = ZR_temp;
       und->gradx[i]=lat_gradx[i];
       und->grady[i]=lat_grady[i];
@@ -166,13 +169,15 @@ void Lattice::calcSlippage(double lambda, double gamma)
   // calc the path length for a chicane
 
   double Lz=0;    // projected path
-  double ZR_temp; // Definition of Rayleigh length
+  //*3/26/2024// double ZR_temp; // Definition of Rayleigh length
+  double z_norm;
   double tmp;
 
   for (int i=0; i< nz;i++){
     if (lat_aw[i]>0){ // within undulator
-      ZR_temp = -lat_ku[i] / (2 * lat_kx[i]);
-      tmp=2*gamma*gamma*lambda/(1+lat_aw[i]*lat_aw[i]/(1 + lat_z[i] * lat_z[i] / (ZR_temp * ZR_temp)));
+      z_norm = -lat_z[i] / lat_ku[0] * (2 * lat_kx[0]);
+       //*3/26/2024//tmp=2*gamma*gamma*lambda/(1+lat_aw[i]*lat_aw[i]/(1 + lat_z[i] * lat_z[i] / (ZR_temp * ZR_temp)));
+      tmp=2*gamma*gamma*lambda/(1+lat_aw[i]*lat_aw[i]/(1 + z_norm*z_norm));
       lat_slip[i]=lat_dz[i]/tmp;
       lat_phase[i]=0;
 

@@ -282,8 +282,8 @@ double Undulator::fc(int h)
   }
 }
 
-//Need to alter these functions next
 
+/*
 double Undulator::faw2(double x, double y) {  // square of the transverse dependence of the undulator field.
     double dx = x - ax[istepz];
     double dy = y - ay[istepz];
@@ -295,20 +295,31 @@ double Undulator::faw(double x, double y) {  // transverse dependence of the und
     double dy = y - ay[istepz];
     return exp(kx[istepz] * (dx * dx + dy * dy)/2); // note kx is scaled as XKX*ku*ku in Lattice.cpp, gradx as ku*GRADX.
 }
+*/
 
-/*
 double Undulator::faw2(double x, double y) {  // square of the transverse dependence of the undulator field.
     double dx = x - ax[istepz];
     double dy = y - ay[istepz];
-    return (1 + kx[istepz] * dx * dx + ky[istepz] * dy * dy + 2 * (gradx[istepz] * dx + grady[istepz] * dy)); // note kx is scaled as XKX*ku*ku in Lattice.cpp, gradx as ku*GRADX.
+    double z_norm = -z[istepz] / kx[istepz] * (2 * kx[istepz]);
+    double x_norm = dx * sqrt(-kx[istepz]) / sqrt(2);
+    double y_norm = dy * sqrt(-kx[istepz]) / sqrt(2);
+    double rsq_norm = y_norm * y_norm + x_norm * x_norm;
+
+    // aw is going to be the axial value of aw therefore when aw*aw*faw*faw. this function will just return the transverse part
+
+    return exp(-2.0*rsq_norm); // note kx is scaled as XKX*ku*ku in Lattice.cpp, gradx as ku*GRADX.
 }
-
-
 
 double Undulator::faw(double x, double y) {  // transverse dependence of the undulator field.
     double dx = x - ax[istepz];
     double dy = y - ay[istepz];
-    return (1 + 0.5 * (kx[istepz] * dx * dx + ky[istepz] * dy * dy) + gradx[istepz] * dx + grady[istepz] * dy); // note kx is scaled as XKX*ku*ku in Lattice.cpp, gradx as ku*GRADX.
+    double z_norm = -z[istepz] / kx[istepz] * (2 * kx[istepz]);
+    double x_norm = dx * sqrt(-kx[istepz]) / sqrt(2);
+    double y_norm = dy * sqrt(-kx[istepz]) / sqrt(2);
+    double rsq_norm = y_norm * y_norm + x_norm * x_norm;
+
+    // aw is going to be the axial value of aw therefore when aw*aw*faw*faw. this function will just return the transverse part
+
+    return exp(-1.0*rsq_norm); // note kx is scaled as XKX*ku*ku in Lattice.cpp, gradx as ku*GRADX.
 }
-*/
 

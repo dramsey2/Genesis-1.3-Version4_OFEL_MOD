@@ -8,36 +8,37 @@
 #include <map>
 #include <stdlib.h>
 
+#include "EFieldSolver.h"
 
 class Beam;
 #include "Undulator.h"
 #include "Particle.h"
 
-
 using namespace std;
 
-class TrackBeam{
- public:
-   TrackBeam();
-   virtual ~TrackBeam();
-   void track(double, Beam *, Undulator *, bool);
+class TrackBeam
+{
+public:
+  TrackBeam();
+  virtual ~TrackBeam();
+  void track(double, Beam *, Undulator *, EFieldSolver, bool);
 
-   /*
-   void (TrackBeam::*ApplyX) (double, double, double *, double *, double, double);
-   void (TrackBeam::*ApplyY) (double, double, double *, double *, double, double);
-   */
-   void (TrackBeam::* ApplyX) (double, double, double, double *, double, double *, double, double);
-   void (TrackBeam::* ApplyY) (double, double, double, double *, double, double *, double, double);
-   void applyDrift(double, double, double, double *, double, double *, double, double);
-   void applyFQuad(double, double, double, double *, double, double *, double, double);
-   void applyDQuad(double, double, double, double *, double, double *, double, double);
-   void applyCorrector(Beam *, double, double);
-   void applyChicane(Beam *, double, double, double, double,double);
-   void applyR56(Beam *, Undulator *, double);
+  /*
+  void (TrackBeam::*ApplyX) (double, double, double *, double *, double, double);
+  void (TrackBeam::*ApplyY) (double, double, double *, double *, double, double);
+  */
+  void (TrackBeam::* ApplyX)(double, double, double, double, double, double*, double*, double*, double*, double, double);
+  void (TrackBeam::* ApplyY)(double, double, double, double, double, double*, double*, double*, double*, double, double);
+  void applyDrift(double , double , double , double , double , double *, double *, double *, double *, double , double );
+  void applyFQuad(double , double , double , double , double , double *, double *, double *, double *, double , double );
+  void applyDQuad(double , double , double , double , double , double *, double *, double *, double *, double , double );
+  void applyCorrector(Beam *, double, double);
+  void applyChicane(Beam *, double, double, double, double, double);
+  void applyR56(Beam *, Undulator *, double);
 
- private:
-   void matmul(double a[][4], double b[][4]);
+private:
+  double er{}, betpar0{};
+  void matmul(double a[][4], double b[][4]);
 };
-
 
 #endif

@@ -36,10 +36,10 @@ private:
     vector<double> rharm;
     vector<complex<double> > rpart;
 
-    double ez{};
+    double ez{}, er{};
     double xks{}, xku{};
 
-    double theta{}, gamma{}, btpar{}, ZR{}, z_pos{};
+    double theta{}, gamma{}, btpar{}, ZR{}, z_pos{}, pxtmp{}, pytmp{};
     double k2gg{}, k2pp{}, k3gg{}, k3pp{};
 
     bool onlyFundamental;
@@ -63,7 +63,7 @@ inline void BeamSolver::initEField(double rmax, int ngrid, int nz, int nphi, dou
 
 inline void BeamSolver::track(double dz, Beam *beam, Undulator *und, bool last)
 {
-  tracker.track(dz,beam,und,last);
+  tracker.track(dz,beam,und, efield, last);
 }
 
 inline void BeamSolver::applyR56(Beam *beam, Undulator *und, double reflen){
