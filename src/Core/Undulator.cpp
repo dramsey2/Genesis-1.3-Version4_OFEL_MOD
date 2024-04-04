@@ -300,26 +300,30 @@ double Undulator::faw(double x, double y) {  // transverse dependence of the und
 double Undulator::faw2(double x, double y) {  // square of the transverse dependence of the undulator field.
     double dx = x - ax[istepz];
     double dy = y - ay[istepz];
-    double z_norm = -z[istepz] / kx[istepz] * (2 * kx[istepz]);
+    //double z_norm = -z[istepz] / ku[istepz] * (2 * kx[istepz]);
+
+    double z_norm = -(z[istepz]-z.size()*M_PI/ku[istepz])/ku[istepz] * (2 * kx[istepz]);
+
     double x_norm = dx * sqrt(-kx[istepz]) / sqrt(2);
     double y_norm = dy * sqrt(-kx[istepz]) / sqrt(2);
     double rsq_norm = y_norm * y_norm + x_norm * x_norm;
 
     // aw is going to be the axial value of aw therefore when aw*aw*faw*faw. this function will just return the transverse part
-
-    return exp(-2.0*rsq_norm); // note kx is scaled as XKX*ku*ku in Lattice.cpp, gradx as ku*GRADX.
+  
+    return exp(-2.0*rsq_norm/sqrt(1 + z_norm*z_norm)); // note kx is scaled as XKX*ku*ku in Lattice.cpp, gradx as ku*GRADX.
 }
 
 double Undulator::faw(double x, double y) {  // transverse dependence of the undulator field.
     double dx = x - ax[istepz];
     double dy = y - ay[istepz];
-    double z_norm = -z[istepz] / kx[istepz] * (2 * kx[istepz]);
+    //double z_norm = -z[istepz] / ku[istepz] * (2 * kx[istepz]);
+    double z_norm = -(z[istepz]-z.size()*M_PI/ku[istepz])/ku[istepz] * (2 * kx[istepz]);
     double x_norm = dx * sqrt(-kx[istepz]) / sqrt(2);
     double y_norm = dy * sqrt(-kx[istepz]) / sqrt(2);
     double rsq_norm = y_norm * y_norm + x_norm * x_norm;
 
     // aw is going to be the axial value of aw therefore when aw*aw*faw*faw. this function will just return the transverse part
 
-    return exp(-1.0*rsq_norm); // note kx is scaled as XKX*ku*ku in Lattice.cpp, gradx as ku*GRADX.
+    return exp(-1.0*rsq_norm/sqrt(1 + z_norm*z_norm)); // note kx is scaled as XKX*ku*ku in Lattice.cpp, gradx as ku*GRADX.
 }
 

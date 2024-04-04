@@ -19,6 +19,9 @@ void TrackBeam::track(double delz, Beam *beam, Undulator *und, EFieldSolver efie
   und->getCorrectorParameters(&cx, &cy);
   und->getChicaneParameters(&angle, &lb, &ld, &lt);
   double z = und->getz();
+  double nstepz = und->getnz();
+
+  double z_shift = z - M_PI*nstepz/ku;
 
   // First pass to pick which to add to apply
 
@@ -108,7 +111,7 @@ void TrackBeam::track(double delz, Beam *beam, Undulator *und, EFieldSolver efie
 #endif
       //double x_temp = p->x;
       //double y_temp = p->y;
-      (this->*ApplyX)(delz, qx, kx, ku, z, &(p->x), &(p->y), &(p->px), &(p->py), gammaz, xoff);
+      (this->*ApplyX)(delz, qx, kx, ku, z_shift, &(p->x), &(p->y), &(p->px), &(p->py), gammaz, xoff);
       // ApplyX will update Y for me
       // this->*ApplyY)(delz,qy, ky, &(p->y), x_temp, &(p->py), gammaz, yoff);
     }
@@ -135,7 +138,6 @@ void TrackBeam::applyFQuad(double delz, double qf, double kx, double ku, double 
   *px = a3 * xtmp * gammaz + a1 * (*px);
   return;
 }
-
 /*
 void TrackBeam::applyDQuad(double delz, double qf, double kx, double* x, double* px, double gammaz, double dx)
 {
@@ -202,6 +204,7 @@ void TrackBeam::applyDQuad(double delz, double qf, double kx, double ku, double 
 {
   // ensure q is negated
   // *The er terms need to be divided by w0* //
+  // In applyX i am actually feeding in a shift z so the undulator is centered on focus.
   // Remember gammaz is betaz*gamma
   //double betpar0 = sqrt(1 - 1 / (gammaz * gammaz));
   double w0 = sqrt(2) * sqrt(-1 / kx);

@@ -39,8 +39,12 @@ void BeamSolver::advance(double delz, Beam *beam, vector< Field *> *field, Undul
 
     double aw = und->getaw();
     double autophase = und->autophase();
-    z_pos = und->getz();
+    double nstepz = und->getnz();
+    //z_pos = und->getz();
+    z_pos =(und->getz()) - M_PI*nstepz/xku; // z_pos is now off set by the interaction distance/2
     ZR = und->getZR();
+
+    
  
  
 
