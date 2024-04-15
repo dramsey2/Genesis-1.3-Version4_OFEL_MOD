@@ -178,7 +178,7 @@ void BeamSolver::ODE(double tgam, double tthet, double z) {
     }
 #endif
     double focal_length = 1; // should be about 1 meter
-    k2pp += xks * (1. - 1. / btpar0) + xku + (betPhase/btpar0 -1)*xku/2 + xku*z/focal_length;                                                   //dtheta/dz
+    k2pp += xks * (1. - 1. / btpar0) + xku + (betPhase/btpar0 -1)*xku/2 + xku*z/focal_length;                     //dtheta/dz
     k2gg += ctmp.imag() / btpar0 / tgam - ez - er*sqrt(pxtmp*pxtmp + pytmp*pytmp)/tgam/btpar0;                    //dgamma/dz
 
 }
