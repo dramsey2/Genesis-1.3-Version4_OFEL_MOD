@@ -20,8 +20,9 @@ void TrackBeam::track(double delz, Beam *beam, Undulator *und, EFieldSolver efie
   und->getChicaneParameters(&angle, &lb, &ld, &lt);
   double z = und->getz();
   double nstepz = und->getnz();
+  double fixdz = und->steplength(); 
 
-  double z_shift = z - M_PI*nstepz/ku;
+  double z_shift = z - fixdz*nstepz/2;
 
   // First pass to pick which to add to apply
 

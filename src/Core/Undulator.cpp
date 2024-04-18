@@ -302,7 +302,7 @@ double Undulator::faw2(double x, double y) {  // square of the transverse depend
     double dy = y - ay[istepz];
     //double z_norm = -z[istepz] / ku[istepz] * (2 * kx[istepz]);
 
-    double z_norm = -(z[istepz]-z.size()*M_PI/ku[istepz])/ku[istepz] * (2 * kx[istepz]);
+    double z_norm = -(z[istepz]-z.size()*dz[istepz]/2)/ku[istepz] * (2 * kx[istepz]);
 
     double x_norm = dx * sqrt(-kx[istepz]) / sqrt(2);
     double y_norm = dy * sqrt(-kx[istepz]) / sqrt(2);
@@ -317,7 +317,7 @@ double Undulator::faw(double x, double y) {  // transverse dependence of the und
     double dx = x - ax[istepz];
     double dy = y - ay[istepz];
     //double z_norm = -z[istepz] / ku[istepz] * (2 * kx[istepz]);
-    double z_norm = -(z[istepz]-z.size()*M_PI/ku[istepz])/ku[istepz] * (2 * kx[istepz]);
+    double z_norm = -(z[istepz]-z.size()*dz[istepz]/2)/ku[istepz] * (2 * kx[istepz]);
     double x_norm = dx * sqrt(-kx[istepz]) / sqrt(2);
     double y_norm = dy * sqrt(-kx[istepz]) / sqrt(2);
     double rsq_norm = y_norm * y_norm + x_norm * x_norm;

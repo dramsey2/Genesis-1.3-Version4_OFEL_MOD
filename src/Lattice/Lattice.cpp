@@ -93,7 +93,7 @@ bool Lattice::generateLattice(Setup *setup, AlterLattice *alt, Undulator *und)
 
       ZR_temp = -lat_ku[0] / (2 * lat_kx[0]);
       //z_norm = -lat_z[i]/lat_ku[0] * (2 * lat_kx[0]);
-      z_norm = -(lat_z[i]-ndata*M_PI/lat_ku[0])/lat_ku[0] * (2 * lat_kx[0]);
+      z_norm = -(lat_z[i]-ndata*delz/2)/lat_ku[0] * (2 * lat_kx[0]);
       //*3/26/2024//und->aw[i]=lat_aw[i]/sqrt(1 + lat_z[i]*lat_z[i]/(ZR_temp*ZR_temp));
       und->aw[i]=lat_aw[i]/sqrt(1 + z_norm*z_norm);
       //und->aw[i]=lat_aw[i];
@@ -177,7 +177,8 @@ void Lattice::calcSlippage(double lambda, double gamma)
   for (int i=0; i< nz;i++){
     if (lat_aw[i]>0){ // within undulator
       //z_norm = -lat_z[i] / lat_ku[0] * (2 * lat_kx[0]);
-      z_norm = -(lat_z[i]-nz*M_PI/lat_ku[0])/lat_ku[0] * (2 * lat_kx[0]);
+      //z_norm = -(lat_z[i]-nz*M_PI/lat_ku[0])/lat_ku[0] * (2 * lat_kx[0]);
+      z_norm = -(lat_z[i]-nz*lat_dz[i]/2)/lat_ku[0] * (2 * lat_kx[0]);
        //*3/26/2024//tmp=2*gamma*gamma*lambda/(1+lat_aw[i]*lat_aw[i]/(1 + lat_z[i] * lat_z[i] / (ZR_temp * ZR_temp)));
       tmp=2*gamma*gamma*lambda/(1+lat_aw[i]*lat_aw[i]/(1 + z_norm*z_norm));
       lat_slip[i]=lat_dz[i]/tmp;
