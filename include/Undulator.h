@@ -48,6 +48,7 @@ class Undulator: public HDF5Base{
    double getaw();
    double getku();
    double getz();
+   double getnz();
    double getZR();
    double faw2(double, double); // should be replace in future versions
    double faw(double, double);  
@@ -106,6 +107,10 @@ inline bool Undulator::outstep(){
 
 inline double Undulator::getz(){
   return (istepz<0 ? 0. : z[istepz]+dz[istepz]);
+}
+
+inline double Undulator::getnz(){
+  return static_cast<double>(nstepz);
 }
 
 inline double Undulator::getaw(){
