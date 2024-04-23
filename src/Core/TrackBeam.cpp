@@ -20,6 +20,10 @@ void TrackBeam::track(double delz, Beam* beam, Undulator* und, bool lastStep = t
 	und->getCorrectorParameters(&cx, &cy);
 	und->getChicaneParameters(&angle, &lb, &ld, &lt);
 	double z = und->getz();
+    double nstepz = und->getnz();
+    double fixdz = und->steplength(); 
+
+	double z_shift = z - fixdz*nstepz/2;
 
 	double betpar0 = sqrt(1 - (1 + aw * aw) / gamma0 / gamma0);
 
@@ -72,11 +76,16 @@ void TrackBeam::track(double delz, Beam* beam, Undulator* und, bool lastStep = t
 	for (int i = 0; i < beam->beam.size(); i++) {
 		for (int j = 0; j < beam->beam.at(i).size(); j++) {
 			Particle* p = &beam->beam.at(i).at(j);
-			double gammaz = sqrt(p->gamma * p->gamma - 1 - aw * aw - p->px * p->px - p->py * p->py); // = gamma*betaz=gamma*(1-(1+aw*aw)/gamma^2);
+			//er = efield.getERField(j);
+      		double awsq_at_p =  (und->faw(p->x, p->y))*(und->faw(p->x, p->y))*aw*aw; // should use the value of aw where the electron is
+      		//double gammaz = sqrt(p->gamma * p->gamma - 1 - aw * aw - p->px * p->px - p->py * p->py); // = gamma*betaz=gamma*(1-(1+aw*aw)/gamma^2);
+      		double gammaz = sqrt(p->gamma * p->gamma - 1 - awsq_at_p - p->px * p->px - p->py * p->py); // = gamma*betaz=gamma*(1-(1+aw*aw)/gamma^2);
+      		betpar0 = gammaz/(p->gamma);
+			
 #ifdef G4_DBGDIAG
 			// G4_DBGDIAG: add test against negative radicand? Note that the particles probably already made lots of noise elsewhere.
 #endif
-			(this->*ApplyX)(delz, qx, kx, ku, z, &(p->x), &(p->y), &(p->px), &(p->py), gammaz, xoff);
+			(this->*ApplyX)(delz, qx, kx, ku, z_shift, &(p->x), &(p->y), &(p->px), &(p->py), gammaz, xoff);
 			//Do not apply Y. It will be updated in ApplyX through the rk4
 			//(this->*ApplyY)(delz,qy, ky, &(p->y), x_temp, &(p->py),gammaz,yoff);
 		}
