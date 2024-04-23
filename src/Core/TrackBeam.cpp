@@ -5,7 +5,7 @@ TrackBeam::TrackBeam() {}
 TrackBeam::~TrackBeam() {}
 
 
-void TrackBeam::track(double delz, Beam* beam, Undulator* und, bool lastStep = true)
+void TrackBeam::track(double delz, Beam *beam,Undulator *und, EFieldSolver efield, bool lastStep=true)
 {
 
 	// get undulator parameter for the given step
@@ -25,7 +25,7 @@ void TrackBeam::track(double delz, Beam* beam, Undulator* und, bool lastStep = t
 
 	double z_shift = z - fixdz*nstepz/2;
 
-	double betpar0 = sqrt(1 - (1 + aw * aw) / gamma0 / gamma0);
+	betpar0 = sqrt(1 - (1 + aw * aw) / gamma0 / gamma0);
 
 	// effective focusing in x and y with the correct energy dependence
 	double qquad = qf * gamma0;
@@ -74,9 +74,12 @@ void TrackBeam::track(double delz, Beam* beam, Undulator* und, bool lastStep = t
 	}
 
 	for (int i = 0; i < beam->beam.size(); i++) {
+		
+		efield.shortRange(&beam->beam.at(i), beam->current.at(i), sqrt(1/(1-betpar0*betpar0)), i);
+
 		for (int j = 0; j < beam->beam.at(i).size(); j++) {
 			Particle* p = &beam->beam.at(i).at(j);
-			//er = efield.getERField(j);
+			er = efield.getERField(j);
       		double awsq_at_p =  (und->faw(p->x, p->y))*(und->faw(p->x, p->y))*aw*aw; // should use the value of aw where the electron is
       		//double gammaz = sqrt(p->gamma * p->gamma - 1 - aw * aw - p->px * p->px - p->py * p->py); // = gamma*betaz=gamma*(1-(1+aw*aw)/gamma^2);
       		double gammaz = sqrt(p->gamma * p->gamma - 1 - awsq_at_p - p->px * p->px - p->py * p->py); // = gamma*betaz=gamma*(1-(1+aw*aw)/gamma^2);
@@ -141,7 +144,7 @@ void TrackBeam::applyDQuad(double delz, double qf, double kx, double ku, double 
 	double z_norm = z / ZR;
 	double factor_on_aw = sqrt((1 + 5 * pow(z_norm, 2) + 4 * pow(z_norm, 4)) / (pow(1 + pow(z_norm, 2), 3)));
 	double qf_fixed =  qf / factor_on_aw / factor_on_aw;
-
+	
 	double focsq = -1 * qf_fixed / gammaz;
 
 
@@ -150,6 +153,7 @@ void TrackBeam::applyDQuad(double delz, double qf, double kx, double ku, double 
 	double dydz = (*py) / gammaz;
 	double xtmp = (*x);
 	double ytmp = (*y);
+
 
 	double xtmp_norm = xtmp / w0;
 	double ytmp_norm = ytmp / w0;
@@ -164,11 +168,12 @@ void TrackBeam::applyDQuad(double delz, double qf, double kx, double ku, double 
 	double K2x = 0;
 	double K2y = 0;
 
+	double angle = atan2(ytmp_norm, xtmp_norm);
 	double exp_and_Arg = exp( - 2 * (xtmp_norm * xtmp_norm + ytmp_norm * ytmp_norm) / (1 + z_norm * z_norm));
 	double com = focsq * exp_and_Arg * ((pow(xtmp_norm, 2) + pow(xtmp_norm, 4) + pow(ytmp_norm, 2) + 2 * pow(xtmp_norm, 2) * pow(ytmp_norm, 2) + pow(ytmp_norm, 4) + (6 - 5 * pow(xtmp_norm, 2) - 5 * pow(ytmp_norm, 2)) * pow(z_norm, 2) + 6 * pow(z_norm, 4))) / pow(1 + pow(z_norm, 2), 4);
 
-	K2dxdz += xtmp_norm * com;
-	K2dydz += ytmp_norm * com;
+	K2dxdz += xtmp_norm * com - (1 - betpar0 * betpar0) * er * cos(angle) / gammaz/w0;
+	K2dydz += ytmp_norm * com-  (1 - betpar0 * betpar0) * er * sin(angle) / gammaz/w0;
 	K2x += dxdz_norm;
 	K2y += dydz_norm;
 
@@ -189,10 +194,11 @@ void TrackBeam::applyDQuad(double delz, double qf, double kx, double ku, double 
 	K2x = 0;
 	K2y = 0;
 
+	angle = atan2(ytmp_norm, xtmp_norm);
 	exp_and_Arg = exp(-2 * (xtmp_norm * xtmp_norm + ytmp_norm * ytmp_norm) / (1 + z_norm * z_norm));
 	com = focsq * exp_and_Arg * ((pow(xtmp_norm, 2) + pow(xtmp_norm, 4) + pow(ytmp_norm, 2) + 2 * pow(xtmp_norm, 2) * pow(ytmp_norm, 2) + pow(ytmp_norm, 4) + (6 - 5 * pow(xtmp_norm, 2) - 5 * pow(ytmp_norm, 2)) * pow(z_norm, 2) + 6 * pow(z_norm, 4))) / pow(1 + pow(z_norm, 2), 4);
-	K2dxdz += xtmp_norm * com;
-	K2dydz += ytmp_norm * com;
+	K2dxdz += xtmp_norm * com - (1 - betpar0 * betpar0) * er * cos(angle) / gammaz/w0;
+	K2dydz += ytmp_norm * com-  (1 - betpar0 * betpar0) * er * sin(angle) / gammaz/w0;
 	K2x += dxdz_norm;
 	K2y += dydz_norm;
 
@@ -212,10 +218,11 @@ void TrackBeam::applyDQuad(double delz, double qf, double kx, double ku, double 
 	K2x *= -0.5;
 	K2y *= -0.5;
 
+	angle = atan2(ytmp_norm, xtmp_norm);
 	exp_and_Arg = exp(-2 * (xtmp_norm * xtmp_norm + ytmp_norm * ytmp_norm) / (1 + z_norm * z_norm));
 	com = focsq * exp_and_Arg * ((pow(xtmp_norm, 2) + pow(xtmp_norm, 4) + pow(ytmp_norm, 2) + 2 * pow(xtmp_norm, 2) * pow(ytmp_norm, 2) + pow(ytmp_norm, 4) + (6 - 5 * pow(xtmp_norm, 2) - 5 * pow(ytmp_norm, 2)) * pow(z_norm, 2) + 6 * pow(z_norm, 4))) / pow(1 + pow(z_norm, 2), 4);
-	K2dxdz += xtmp_norm * com;
-	K2dydz += ytmp_norm * com;
+	K2dxdz += xtmp_norm * com - (1 - betpar0 * betpar0) * er * cos(angle) / gammaz/w0;
+	K2dydz += ytmp_norm * com-  (1 - betpar0 * betpar0) * er * sin(angle) / gammaz/w0;
 	K2x += dxdz_norm;
 	K2y += dydz_norm;
 
@@ -235,10 +242,11 @@ void TrackBeam::applyDQuad(double delz, double qf, double kx, double ku, double 
 	K2x *= 2;
 	K2y *= 2;
 
+	angle = atan2(ytmp_norm, xtmp_norm);
 	exp_and_Arg = exp(-2 * (xtmp_norm * xtmp_norm + ytmp_norm * ytmp_norm) / (1 + z_norm * z_norm));
 	com = focsq * exp_and_Arg * ((pow(xtmp_norm, 2) + pow(xtmp_norm, 4) + pow(ytmp_norm, 2) + 2 * pow(xtmp_norm, 2) * pow(ytmp_norm, 2) + pow(ytmp_norm, 4) + (6 - 5 * pow(xtmp_norm, 2) - 5 * pow(ytmp_norm, 2)) * pow(z_norm, 2) + 6 * pow(z_norm, 4))) / pow(1 + pow(z_norm, 2), 4);
-	K2dxdz += xtmp_norm * com;
-	K2dydz += ytmp_norm * com;
+	K2dxdz += xtmp_norm * com - (1 - betpar0 * betpar0) * er * cos(angle) / gammaz/w0;
+	K2dydz += ytmp_norm * com-  (1 - betpar0 * betpar0) * er * sin(angle) / gammaz/w0;
 	K2x += dxdz_norm;
 	K2y += dydz_norm;
 

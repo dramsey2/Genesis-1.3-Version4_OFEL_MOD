@@ -8,6 +8,8 @@
 #include <map>
 #include <stdlib.h>
 
+#include "EFieldSolver.h"
+
 
 class Beam;
 #include "Undulator.h"
@@ -20,7 +22,9 @@ class TrackBeam{
  public:
    TrackBeam();
    virtual ~TrackBeam();
-   void track(double, Beam *, Undulator *, bool);
+   //void track(double, Beam *, Undulator *, bool);
+
+   void track(double, Beam *, Undulator *, EFieldSolver, bool);
 
    /*
    void (TrackBeam::*ApplyX) (double, double, double *, double *, double, double);
@@ -40,6 +44,7 @@ class TrackBeam{
 
  private:
    void matmul(double a[][4], double b[][4]);
+   double er{}, betpar0{};
 };
 
 

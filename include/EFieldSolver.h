@@ -27,6 +27,7 @@ public:
     void shortRange(vector<Particle> *, double, double, int);
     void longRange(Beam *beam, double gamma, double aw);
     double getEField(unsigned long i);
+    double getERField(unsigned long i);
     bool hasShortRange() const;
     void allocateForOutput(unsigned long nslice);
     double getSCField(int);
@@ -40,8 +41,9 @@ private:
     vector<complex<double> > cwork;
     vector<int> idxr;
     vector<double> lmid, rlog, vol, ldig;
+    vector<double> srcR;
     vector<complex<double> > csrc, clow, cmid, cupp, celm, gam; // used for tridiag routine
-    vector<double> ez,efield;
+    vector<double> ez, er, efield;
 
     int nz, nphi, ngrid, rank;
     double rmax, ks, xcen, ycen, dr;

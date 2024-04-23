@@ -62,6 +62,11 @@ void BeamSolver::advance(double delz, Beam *beam, vector< Field *> *field, Undul
             double awloc = und->faw(x, y);                 // get the transverse dependence of the undulator field
             btpar = 1 + px * px + py * py + aw * aw * awloc * awloc;
             ez = efield.getEField(ip) + eloss;  // adding global long range space charge field to each particle
+            er = efield.getERField(ip);
+
+            pxtmp = px;
+            pytmp = py;
+
             cpart = 0;
             double wx, wy;
             int idx;
@@ -161,8 +166,8 @@ void BeamSolver::ODE(double tgam,double tthet, double z) {
       cout << "DBGDIAG(BeamSolver::ODE): error, negative radicand detected" << endl;
     }
 #endif
-    k2pp += xks * (1. - 1. / btpar0) + xku;             //dtheta/dz
-    k2gg += ctmp.imag() / btpar0 / tgam - ez;         //dgamma/dz
+    k2pp += xks * (1. - 1. / btpar0) + xku;                                                             //dtheta/dz
+    k2gg += ctmp.imag() / btpar0 / tgam - ez - er*sqrt(pxtmp*pxtmp + pytmp*pytmp)/tgam/btpar0;         //dgamma/dz
 }
 
 void BeamSolver::checkAllocation(unsigned long nslice) {
