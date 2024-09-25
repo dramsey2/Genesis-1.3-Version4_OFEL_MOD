@@ -30,6 +30,7 @@ class Time: public StringProcessing{
 
    int getPosition(std::vector<double> *);
    double getSampleRate();
+   double getSampleds();
    double getTimeWindowStart();
    double getTimeWindowLength();
    bool isTime();
@@ -69,6 +70,12 @@ inline double Time::getSampleRate()
 {
   if (dotime) { return sample;} else { return 1.; }
   //return sample;
+}
+
+inline double Time::getSampleds()
+{
+  if (dotime) { return ds;} else { return 1.; }
+  //return sample step;
 }
 
 

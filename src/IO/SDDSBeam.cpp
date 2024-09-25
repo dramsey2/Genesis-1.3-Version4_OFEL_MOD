@@ -331,7 +331,7 @@ bool SDDSBeam::init(int inrank, int insize, map<string,string> *arg, Beam *beam,
   int nslice=time->getPosition(&s);
   int node_off=time->getNodeOffset();
   int node_len=time->getNodeNSlice();
-  beam->init(time->getNodeNSlice(),nbins,lambda,sample*lambda,s[0],one4one);  // init beam
+  beam->init(time->getNodeNSlice(),nbins,lambda,sample*lambda,s[0],time->getSampleds(), rank, one4one);  // init beam
   beam->initSorting(rank,size,false,one4one); 
 
   double smin=s[node_off];

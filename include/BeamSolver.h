@@ -25,7 +25,7 @@ public:
     BeamSolver();
     virtual ~BeamSolver();
     void initEField(double rmax, int ngrid, int nz, int nphi, double lambda, bool longr);
-    void advance(double, Beam*, vector<Field*>*, Undulator*);
+    void advance(int rank, double, Beam*, vector<Field*>*, Undulator*);
     void track(double, Beam*, Undulator*, bool);
     void applyR56(Beam*, Undulator*, double);
     double getSCField(int);
@@ -36,10 +36,10 @@ private:
     vector<double> rharm;
     vector<complex<double> > rpart;
 
-    double ez{},er{}, betPhase{};
+    double ez{},er{}, betPhase{}, focal_length{};
     double xks{}, xku{};
 
-    double theta{}, gamma{}, btpar{}, z_pos{}, pxtmp{}, pytmp{};
+    double theta{}, gamma{}, btpar{}, z_pos{}, rels{}, intL{}, pxtmp{}, pytmp{};
     double k2gg{}, k2pp{}, k3gg{}, k3pp{};
 
     bool onlyFundamental;

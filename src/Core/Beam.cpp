@@ -19,14 +19,17 @@ Beam::Beam(){
       beam_write_slices_inc=1;
 }
 
-void Beam::init(int nsize, int nbins_in, double reflen_in, double slicelen_in, double s0_in, bool one4one_in ) {
+void Beam::init(int nsize, int nbins_in, double reflen_in, double slicelen_in, double s0_in, double ds_in, int rank_in, bool one4one_in ) {
 
     nbins = nbins_in;
     reflength = reflen_in;  // the length corresponding to 2pi in ponderomotive phase.
     slicelength = slicelen_in;  // reflength times samplerate.
     s0 = s0_in;
+    ds = ds_in;
+    rank = rank_in;
     one4one = one4one_in;
     do_global_stat = false;
+   
 
     current.resize(nsize);
     eloss.resize(nsize);
@@ -101,7 +104,7 @@ void Beam::track(double delz,vector<Field *> *field, Undulator *und){
 
   solver.track(delz*0.5,this,und, false);   // track transverse coordinates first half of integration step
 
-  solver.advance(delz,this,field, und);     // advance longitudinal variables 
+  solver.advance(rank, delz,this,field, und);     // advance longitudinal variables 
 
   incoherent.apply(this,und,delz);         // apply effect of incoherent synchrotron
   col.apply(this,und,delz);         // apply effect of collective effects

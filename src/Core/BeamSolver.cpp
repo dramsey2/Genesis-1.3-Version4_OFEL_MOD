@@ -11,7 +11,7 @@ BeamSolver::BeamSolver()
 BeamSolver::~BeamSolver() = default;
 
 
-void BeamSolver::advance(double delz, Beam* beam, vector< Field*>* field, Undulator* und) {
+void BeamSolver::advance(int rank, double delz, Beam* beam, vector< Field*>* field, Undulator* und) {
 
     // here the harmonics needs to be taken into account
 
@@ -40,8 +40,11 @@ void BeamSolver::advance(double delz, Beam* beam, vector< Field*>* field, Undula
 
     double aw = und->getaw();
     double autophase = und->autophase();
-    z_pos = und->getz();
-
+    //cout<< autophase << endl;
+    focal_length = 5/3;
+   
+    //cout << (beam->ds)*(rank)<< endl;
+    //z_pos = (und->getz()) ;
 
     // obtaining long range space charge field
     efield.longRange(beam, und->getGammaRef(), aw);  // defines the array beam->longESC
@@ -52,7 +55,12 @@ void BeamSolver::advance(double delz, Beam* beam, vector< Field*>* field, Undula
         // accumulate space charge field
         double eloss = -beam->longESC[is] / 511000; // convert eV to units of electron rest mass
         efield.shortRange(&beam->beam.at(is), beam->current.at(is), gammaz2, is); // er and ez are calculated
-
+        //double rel_thetaCorrection =  pow((beam->ds)*(is + rank*(beam->beam.size())),2)*xku/2/focal_length; // 
+        //z_pos = (und->getz()) + (beam->ds)*(static_cast<double>(is) + rank*(beam->beam.size())) - ; // Add in relative position correction -> getz returns the nominal z every and each slice has a slightly different location in space
+        z_pos = (und->getz()) ;
+        rels =  (beam->ds)*(static_cast<double>(is) + rank*(beam->beam.size()));
+        intL =  (und->steplength())*(und->getnz());
+        //cout <<  (beam->ds)*(is + rank*(beam->beam.size())) << endl;
         double rmsBradius_sq = beam->getSize(is); // for some reason this is the rms^2
         double omegapDiv_c_sq = vacimp * (beam->current.at(is)) / rmsBradius_sq / eev;
         betPhase = sqrt(1 + 4 * omegapDiv_c_sq  / xku / xku / (und->getGammaRef()));
@@ -60,7 +68,7 @@ void BeamSolver::advance(double delz, Beam* beam, vector< Field*>* field, Undula
 
         for (int ip = 0; ip < beam->beam.at(is).size(); ip++) {
             gamma = beam->beam.at(is).at(ip).gamma;
-            theta = beam->beam.at(is).at(ip).theta + autophase; // add autophase here
+            theta = beam->beam.at(is).at(ip).theta + autophase; //- rel_thetaCorrection; // add autophase here + slice position iniitalization
             double x = beam->beam.at(is).at(ip).x;
             double y = beam->beam.at(is).at(ip).y;
             double px = beam->beam.at(is).at(ip).px;
@@ -177,8 +185,8 @@ void BeamSolver::ODE(double tgam, double tthet, double z) {
         cout << "DBGDIAG(BeamSolver::ODE): error, negative radicand detected" << endl;
     }
 #endif
-    double focal_length = 1; // should be about 1 meter
-    k2pp += xks * (1. - 1. / btpar0) + xku + (betPhase/btpar0 -1)*xku/2 + xku*z/focal_length;                     //dtheta/dz
+    
+    k2pp += xks * (1. - 1. / btpar0) + xku + (betPhase/btpar0 -1)*xku/2 + xku*z/focal_length - xku*intL/4/focal_length + xku*rels/2/focal_length;//xku*z/focal_length;                     //dtheta/dz
     k2gg += ctmp.imag() / btpar0 / tgam - ez - er*sqrt(pxtmp*pxtmp + pytmp*pytmp)/tgam/btpar0;                    //dgamma/dz
 
 }

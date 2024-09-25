@@ -20,7 +20,7 @@ class Beam{
  public:
    Beam();
    virtual ~Beam();
-   void init(int, int, double,double, double,bool);
+   void init(int, int, double,double, double, double, int, bool);
    void initSorting(int,int,bool,bool);
    void initEField(double,int,int,int,double,bool);
    void initIncoherent(int, int, bool,bool);
@@ -58,6 +58,8 @@ class Beam{
 
    double reflength,slicelength;   // for conversion of theta in Particle to real position
    double s0;         // starting position of the time-window
+   double ds;         // step size
+   int rank;          // Node rank
    bool one4one;     // flag whether one4one simulation is done
    int nbins;
 

@@ -52,7 +52,7 @@ void LoadBeam::usage(){
 bool LoadBeam::init(int rank, int size, map<string,string> *arg, Beam *beam, Setup *setup, Time *time, Profile *prof, Lattice *lat)
 {
 
-
+  
   if (beam->beam.size()>0){
     if (rank==0) {cout << "*** Error: Cannot generat beam, because beam is already defined" << endl; }
     return false;
@@ -140,7 +140,7 @@ bool LoadBeam::init(int rank, int size, map<string,string> *arg, Beam *beam, Set
   vector<double> s;
   int nslice=time->getPosition(&s);
 
-  beam->init(time->getNodeNSlice(),nbins,lambda,sample*lambda,s[0],one4one);
+  beam->init(time->getNodeNSlice(),nbins,lambda,sample*lambda,s[0], time->getSampleds(), rank, one4one);
   beam->initSorting(rank,size,false,one4one);  // sorting routine is initialized, with default values to suppress field slippage but do sorting if one4one is enabled
 
   int nbeam=1024;
